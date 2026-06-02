@@ -142,6 +142,11 @@
     return Math.floor(s / 86400) + 'd ago';
   };
 
+  const avCircle = (cls, url, fallback, isIcon = false) => url
+    ? `<div class="${cls}" style="padding:0;overflow:hidden"><img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`
+    : isIcon ? `<div class="${cls}" data-icon="${fallback}"></div>` : `<div class="${cls}">${fallback}</div>`;
+  let avatarMap = new Map();
+
   // ── Author identity (for new posts) ──
   let authorName = 'Member';
   let meEmail    = '';
@@ -291,10 +296,6 @@
 
   // ════════════ MEMBERS: follow + DM ════════════
   const initials = (n) => (n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  const avCircle = (cls, url, fallback, isIcon = false) => url
-    ? `<div class="${cls}" style="padding:0;overflow:hidden"><img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`
-    : isIcon ? `<div class="${cls}" data-icon="${fallback}"></div>` : `<div class="${cls}">${fallback}</div>`;
-  let avatarMap = new Map();
   const membersEl = document.getElementById('members-list');
 
   async function renderMembers(preloadedDir) {
