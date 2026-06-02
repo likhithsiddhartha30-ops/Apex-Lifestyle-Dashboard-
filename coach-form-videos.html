@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Form Correction Videos</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+.cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.cat-tab{padding:7px 18px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-transform:capitalize;letter-spacing:.3px}
+.cat-tab:hover{border-color:var(--accent);color:var(--accent)}
+.cat-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:var(--gap)}
+.video-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .15s}
+.video-card:hover{border-color:var(--border2)}
+.video-thumb{position:relative;aspect-ratio:16/9;background:#111;cursor:pointer;overflow:hidden}
+.video-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s}
+.video-thumb:hover img{opacity:.8}
+.play-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.play-ring .icon{width:18px;height:18px;stroke:#fff;fill:#fff}
+.video-thumb iframe{width:100%;height:100%;border:none;position:absolute;inset:0}
+.video-info{padding:14px}
+.video-title{font-size:13px;font-weight:700;color:var(--t1);line-height:1.4;margin-bottom:5px}
+.video-desc{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.video-footer{display:flex;align-items:center;justify-content:space-between}
+.cat-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:var(--accent-dim);color:var(--accent);text-transform:capitalize;letter-spacing:.4px}
+.vid-del{background:none;border:none;color:var(--t3);cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center;transition:color .15s}
+.vid-del:hover{color:var(--red)}
+.vid-del .icon{width:14px;height:14px;stroke:currentColor;fill:none}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-ov.open{opacity:1;pointer-events:auto}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:28px;width:100%;max-width:480px;margin:16px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-head-title{font-size:16px;font-weight:900;color:var(--t1)}
+.modal-x{background:none;border:none;color:var(--t2);cursor:pointer;font-size:20px;line-height:1;padding:0}
+.frow{margin-bottom:14px}
+.flabel{display:block;font-size:10px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--t2);font-size:13px;grid-column:1/-1}
+.empty-icon{margin:0 auto 14px;width:40px;height:40px;color:var(--t3);display:flex;align-items:center;justify-content:center}
+.empty-icon .icon{width:40px;height:40px;stroke:currentColor;fill:none}
+.src-toggle{display:flex;gap:0;background:var(--bg2);border-radius:6px;padding:3px;margin-top:4px}
+.src-btn{flex:1;padding:7px 12px;border:none;border-radius:5px;background:none;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.src-btn.active{background:var(--accent);color:#fff}
+#vid-upload-area:hover{border-color:var(--accent) !important;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Coach</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon"></span>
+      <input type="text" placeholder="Search members...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn"><span class="notif-dot"></span></div>
+      <div class="icon-btn"></div>
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="pg-eyebrow">Library</div>
+    <div class="pg-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      Form Correction Videos
+      <button id="add-video-btn" class="btn-accent" style="padding:9px 18px;font-size:13px;display:flex;align-items:center;gap:7px">
+        <span style="font-size:18px;line-height:1;margin-top:-1px">+</span> Add Video
+      </button>
+    </div>
+
+    <div class="cat-tabs" id="cat-tabs">
+      <button class="cat-tab active" data-cat="">All</button>
+      <button class="cat-tab" data-cat="chest">Chest</button>
+      <button class="cat-tab" data-cat="legs">Legs</button>
+      <button class="cat-tab" data-cat="back">Back</button>
+      <button class="cat-tab" data-cat="shoulders">Shoulders</button>
+      <button class="cat-tab" data-cat="arms">Arms</button>
+      <button class="cat-tab" data-cat="core">Core</button>
+      <button class="cat-tab" data-cat="stretching">Stretching</button>
+    </div>
+
+    <div class="video-grid" id="video-grid">
+      <div style="color:var(--t2);font-size:13px;padding:8px">Loading…</div>
+    </div>
+  </div>
+</main>
+
+<!-- Add Video Modal -->
+<div class="modal-ov" id="add-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-head-title">Add Form Video</div>
+      <button class="modal-x" id="modal-x">✕</button>
+    </div>
+    <div class="frow">
+      <label class="flabel" for="vid-title">Title</label>
+      <input id="vid-title" class="form-input" type="text" placeholder="e.g. Bench Press — Shoulder Retraction" style="width:100%">
+    </div>
+    <div class="frow">
+      <label class="flabel">Video Source</label>
+      <div class="src-toggle">
+        <button class="src-btn active" data-src="youtube">YouTube Link</button>
+        <button class="src-btn" data-src="upload">Upload File</button>
+      </div>
+    </div>
+    <div class="frow" id="yt-panel">
+      <label class="flabel" for="vid-url">YouTube URL</label>
+      <input id="vid-url" class="form-input" type="url" placeholder="https://youtube.com/watch?v=…" style="width:100%">
+    </div>
+    <div class="frow" id="up-panel" style="display:none">
+      <label class="flabel">Video File <span style="font-weight:400;text-transform:none;letter-spacing:0">(MP4 / MOV / WebM — max 500 MB)</span></label>
+      <div id="vid-upload-area" style="border:1px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;color:var(--t2);font-size:12px;transition:border-color .15s,color .15s">
+        <div style="margin-bottom:6px"><span data-icon="play"></span></div>
+        <div>Click to choose a video file</div>
+      </div>
+      <input type="file" id="vid-file" accept="video/*" style="display:none">
+      <div id="vid-file-preview" style="margin-top:8px;display:none"></div>
+    </div>
+    <div class="frow">
+      <label class="flabel" for="vid-cat">Category</label>
+      <select id="vid-cat" class="form-input" style="width:100%">
+        <option value="chest">Chest</option>
+        <option value="legs">Legs</option>
+        <option value="back">Back</option>
+        <option value="shoulders">Shoulders</option>
+        <option value="arms">Arms</option>
+        <option value="core">Core</option>
+        <option value="stretching">Stretching</option>
+      </select>
+    </div>
+    <div class="frow">
+      <label class="flabel" for="vid-desc">Description <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea id="vid-desc" class="form-input" rows="3" placeholder="Key cues to watch for…" style="resize:vertical;width:100%;line-height:1.6"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button id="modal-cancel" class="btn-outline" style="padding:9px 20px">Cancel</button>
+      <button id="modal-save" class="btn-accent" style="padding:9px 24px">Add Video</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+
+  const canEdit = ['admin', 'coach'].includes(window._apexRole);
+  const esc = t => (t || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  let activeCategory = '';
+  let allVideos = [];
+
+  document.getElementById('cat-tabs').addEventListener('click', e => {
+    const tab = e.target.closest('.cat-tab');
+    if (!tab) return;
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeCategory = tab.dataset.cat;
+    renderGrid();
+  });
+
+  function getYouTubeId(url) {
+    const m = (url || '').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : null;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('video-grid');
+    const list = activeCategory ? allVideos.filter(v => v.category === activeCategory) : allVideos;
+    if (!list.length) {
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon"><span data-icon="play"></span></div>
+        <div style="font-weight:700;font-size:14px;color:var(--t1);margin-bottom:6px">No videos here yet</div>
+        <div>${canEdit ? 'Click <strong>+ Add Video</strong> to add the first one.' : 'Videos will appear here once added.'}</div>
+      </div>`;
+      renderIcons(grid);
+      return;
+    }
+    grid.innerHTML = list.map(v => {
+      const ytId = getYouTubeId(v.url);
+      const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+      return `
+        <div class="video-card" data-id="${esc(String(v.id))}">
+          ${ytId ? `
+          <div class="video-thumb" data-ytid="${esc(ytId)}">
+            <img src="${esc(thumb)}" alt="${esc(v.title)}" loading="lazy">
+            <div class="play-ring"><span data-icon="play"></span></div>
+          </div>` : v.url ? `
+          <div class="video-thumb" data-url="${esc(v.url)}">
+            <video src="${esc(v.url)}" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video>
+            <div class="play-ring"><span data-icon="play"></span></div>
+          </div>` : ''}
+          <div class="video-info">
+            <div class="video-title">${esc(v.title)}</div>
+            ${v.description ? `<div class="video-desc">${esc(v.description)}</div>` : ''}
+            <div class="video-footer">
+              <span class="cat-badge">${esc(v.category)}</span>
+              ${canEdit ? `<button class="vid-del" title="Remove video"><span data-icon="trash"></span></button>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    renderIcons(grid);
+
+    grid.querySelectorAll('.video-thumb').forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        const ytId = thumb.dataset.ytid;
+        if (ytId) {
+          thumb.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+          const vid = thumb.querySelector('video');
+          if (vid) { thumb.querySelector('.play-ring')?.remove(); vid.setAttribute('controls', ''); vid.play().catch(() => {}); }
+        }
+      });
+    });
+
+    if (canEdit) {
+      grid.querySelectorAll('.vid-del').forEach(btn => {
+        btn.addEventListener('click', async e => {
+          e.stopPropagation();
+          const card = btn.closest('.video-card');
+          const id = card.dataset.id;
+          if (!confirm('Remove this video?')) return;
+          btn.disabled = true;
+          try {
+            await deleteFormVideo(id);
+            allVideos = allVideos.filter(v => String(v.id) !== id);
+            renderGrid();
+            if (window.toast) window.toast('Video removed', 'success');
+          } catch (_) {
+            if (window.toast) window.toast('Could not remove', 'error');
+            btn.disabled = false;
+          }
+        });
+      });
+    }
+  }
+
+  async function loadVideos() {
+    const grid = document.getElementById('video-grid');
+    grid.innerHTML = '<div style="color:var(--t2);font-size:13px;padding:8px">Loading…</div>';
+    try {
+      allVideos = await loadFormVideos();
+      renderGrid();
+    } catch (_) {
+      grid.innerHTML = '<div style="color:var(--t2);font-size:13px;padding:8px">Could not load videos.</div>';
+    }
+  }
+
+  if (canEdit) {
+    const modal    = document.getElementById('add-modal');
+    const vidFile  = document.getElementById('vid-file');
+    const upArea   = document.getElementById('vid-upload-area');
+    const filePrev = document.getElementById('vid-file-preview');
+    let vidSource   = 'youtube';
+    let pendingFile = null;
+
+    const resetForm = () => {
+      document.getElementById('vid-title').value = '';
+      document.getElementById('vid-url').value   = '';
+      document.getElementById('vid-desc').value  = '';
+      document.getElementById('vid-cat').value   = 'chest';
+      vidSource = 'youtube'; pendingFile = null; vidFile.value = '';
+      document.querySelectorAll('.src-btn').forEach(b => b.classList.toggle('active', b.dataset.src === 'youtube'));
+      document.getElementById('yt-panel').style.display = '';
+      document.getElementById('up-panel').style.display = 'none';
+      filePrev.style.display = 'none';
+      upArea.innerHTML = `<div style="margin-bottom:6px"><span data-icon="play"></span></div><div>Click to choose a video file</div>`;
+      renderIcons(upArea);
+    };
+    const openModal  = () => modal.classList.add('open');
+    const closeModal = () => { modal.classList.remove('open'); resetForm(); };
+
+    document.querySelectorAll('.src-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.src-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        vidSource = btn.dataset.src;
+        document.getElementById('yt-panel').style.display = vidSource === 'youtube' ? '' : 'none';
+        document.getElementById('up-panel').style.display = vidSource === 'upload'  ? '' : 'none';
+      });
+    });
+
+    upArea.addEventListener('click', () => vidFile.click());
+    vidFile.addEventListener('change', () => {
+      const f = vidFile.files && vidFile.files[0];
+      if (!f) { pendingFile = null; filePrev.style.display = 'none'; return; }
+      if (f.size > 500 * 1024 * 1024) {
+        if (window.toast) window.toast('Video too large (max 500 MB)', 'error');
+        vidFile.value = ''; return;
+      }
+      pendingFile = f;
+      const objUrl = URL.createObjectURL(f);
+      filePrev.innerHTML = `<video src="${objUrl}" controls style="width:100%;max-height:180px;border-radius:var(--r);background:#000"></video>`;
+      filePrev.style.display = '';
+      upArea.innerHTML = `<div style="color:var(--accent);font-size:12px;font-weight:700">${esc(f.name)}</div><div style="font-size:10px;color:var(--t2);margin-top:3px">Click to change</div>`;
+    });
+
+    document.getElementById('add-video-btn').addEventListener('click', openModal);
+    document.getElementById('modal-x').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    document.getElementById('modal-save').addEventListener('click', async () => {
+      const title = document.getElementById('vid-title').value.trim();
+      const cat   = document.getElementById('vid-cat').value;
+      const desc  = document.getElementById('vid-desc').value.trim();
+      if (!title) { if (window.toast) window.toast('Title is required', 'error'); return; }
+      let url = '';
+      if (vidSource === 'youtube') {
+        url = document.getElementById('vid-url').value.trim();
+        if (!url) { if (window.toast) window.toast('YouTube URL is required', 'error'); return; }
+      } else {
+        if (!pendingFile) { if (window.toast) window.toast('Please select a video file', 'error'); return; }
+      }
+      const saveBtn = document.getElementById('modal-save');
+      saveBtn.disabled = true;
+      try {
+        if (vidSource === 'upload') { saveBtn.textContent = 'Uploading…'; url = await uploadFormVideo(pendingFile); }
+        saveBtn.textContent = 'Saving…';
+        await saveFormVideo(title, url, desc, cat);
+        closeModal();
+        if (window.toast) window.toast('Video added ✓', 'success');
+        await loadVideos();
+      } catch (err) {
+        if (window.toast) window.toast(err.message || 'Could not save', 'error');
+      } finally {
+        saveBtn.disabled = false; saveBtn.textContent = 'Add Video';
+      }
+    });
+  } else {
+    const addBtn = document.getElementById('add-video-btn');
+    if (addBtn) addBtn.style.display = 'none';
+  }
+
+  await loadVideos();
+})();
+</script>
+</body>
+</html>

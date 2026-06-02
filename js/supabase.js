@@ -517,6 +517,85 @@ async function likePost(id, likes) {
   }
 }
 
+async function deletePost(id) {
+  try {
+    await db.from('post_comments').delete().eq('post_id', id);
+    const { error } = await db.from('posts').delete().eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[Supabase] deletePost:', e.message);
+    throw e;
+  }
+}
+
+// ── Post Comments ─────────────────────────────────────────────────────────
+
+async function loadComments(postId) {
+  try {
+    const { data, error } = await db.from('post_comments')
+      .select('*').eq('post_id', postId).order('created_at', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[Supabase] loadComments:', e.message);
+    return [];
+  }
+}
+
+async function saveComment(postId, authorName, authorRole, body, authorEmail) {
+  try {
+    const { error } = await db.from('post_comments')
+      .insert({ post_id: postId, author_name: authorName, author_role: authorRole, body, author_email: authorEmail });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[Supabase] saveComment:', e.message);
+    throw e;
+  }
+}
+
+// ── Form Correction Videos ──────────────────────────────────────────────────
+
+async function uploadFormVideo(file) {
+  const ext  = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = `form-videos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await db.storage.from('community')
+    .upload(path, file, { upsert: false, contentType: file.type || 'video/mp4' });
+  if (error) throw error;
+  const { data } = db.storage.from('community').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function loadFormVideos() {
+  try {
+    const { data, error } = await db.from('form_videos').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[Supabase] loadFormVideos:', e.message);
+    return [];
+  }
+}
+
+async function saveFormVideo(title, url, description, category) {
+  try {
+    const { error } = await db.from('form_videos').insert({ title, url, description, category });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[Supabase] saveFormVideo:', e.message);
+    throw e;
+  }
+}
+
+async function deleteFormVideo(id) {
+  try {
+    const { error } = await db.from('form_videos').delete().eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[Supabase] deleteFormVideo:', e.message);
+    throw e;
+  }
+}
+
 // Members ranked by workouts logged (sessions) — for leaderboard / top athletes
 async function loadCommunityRanking() {
   try {
@@ -559,9 +638,10 @@ const APEX_PORTAL = {
       { page: 'admin-training.html',   label: 'Training',   icon: 'zap' },
       { page: 'admin-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'admin-biometrics.html', label: 'Biometrics', icon: 'trending' },
-      { page: 'admin-community.html',  label: 'Community',  icon: 'users' },
-      { page: 'admin-inbox.html',      label: 'Inbox',      icon: 'message' },
-      { page: 'admin.html',            label: 'Management', icon: 'settings' },
+      { page: 'admin-community.html',    label: 'Community',    icon: 'users' },
+      { page: 'admin-form-videos.html', label: 'Form Videos',  icon: 'play' },
+      { page: 'admin-inbox.html',       label: 'Inbox',        icon: 'message' },
+      { page: 'admin.html',             label: 'Management',   icon: 'settings' },
     ],
   },
   coach: {
@@ -571,8 +651,9 @@ const APEX_PORTAL = {
       { page: 'coach-training.html',   label: 'Training',   icon: 'zap' },
       { page: 'coach-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'coach-biometrics.html', label: 'Biometrics', icon: 'trending' },
-      { page: 'coach-community.html',  label: 'Community',  icon: 'users' },
-      { page: 'coach-inbox.html',      label: 'Inbox',      icon: 'message' },
+      { page: 'coach-community.html',    label: 'Community',    icon: 'users' },
+      { page: 'coach-form-videos.html', label: 'Form Videos',  icon: 'play' },
+      { page: 'coach-inbox.html',       label: 'Inbox',        icon: 'message' },
     ],
   },
   client: {
@@ -582,8 +663,9 @@ const APEX_PORTAL = {
       { page: 'client-training.html',   label: 'Training',   icon: 'zap' },
       { page: 'client-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'client-biometrics.html', label: 'Biometrics', icon: 'trending' },
-      { page: 'client-community.html',  label: 'Community',  icon: 'users' },
-      { page: 'client-inbox.html',      label: 'Inbox',      icon: 'message' },
+      { page: 'client-community.html',    label: 'Community',    icon: 'users' },
+      { page: 'client-form-videos.html', label: 'Form Videos',  icon: 'play' },
+      { page: 'client-inbox.html',       label: 'Inbox',        icon: 'message' },
     ],
   },
 };
