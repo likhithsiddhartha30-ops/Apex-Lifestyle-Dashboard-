@@ -94,6 +94,8 @@
 
         <div class="card" style="margin-top:var(--gap)">
           <div class="card-title">Members <span style="font-size:10px;color:var(--t3);font-weight:400">· follow &amp; message</span></div>
+          <input id="member-search" class="form-input" type="text" placeholder="Search members…"
+            style="width:100%;margin:8px 0 4px;padding:7px 11px;font-size:12px">
           <div id="members-list" style="margin-top:6px">
             <div style="color:var(--t2);font-size:13px;padding:8px">Loading…</div>
           </div>
@@ -339,6 +341,18 @@
       btn.addEventListener('click', () => {
         const row = btn.closest('.member-row');
         openDM(row.dataset.email, row.dataset.name, row.dataset.role);
+      });
+    });
+  }
+
+  // ── Member search filter ──
+  const memberSearchEl = document.getElementById('member-search');
+  if (memberSearchEl) {
+    memberSearchEl.addEventListener('input', () => {
+      const q = memberSearchEl.value.trim().toLowerCase();
+      membersEl.querySelectorAll('.member-row').forEach(row => {
+        const match = !q || (row.dataset.name || '').toLowerCase().includes(q) || (row.dataset.role || '').toLowerCase().includes(q);
+        row.style.display = match ? '' : 'none';
       });
     });
   }

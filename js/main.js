@@ -5,6 +5,7 @@
 /* ── Clean line-icon system (replaces all emoji) ──────────── */
 window.APEX_ICONS = {
   grid:    '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  mail:    '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
   zap:     '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
   utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
   trending:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
@@ -317,6 +318,8 @@ window.uploadAvatar = async function (file) {
       const { data: { user } } = await db.auth.getUser();
       if (user && user.email && typeof saveUserAvatar === 'function') {
         await saveUserAvatar(user.email, dataUrl);
+        // Reset sync gate so next session knows the latest photo is already in DB
+        try { sessionStorage.removeItem(`av_synced_${user.email}`); } catch (_) {}
       }
     } catch (_) {}
   }
@@ -450,7 +453,9 @@ function initMemberSearch() {
       .slice(0, 8);
     results.innerHTML = matches.length ? matches.map(u => `
       <div class="search-res-item" data-email="${esc(u.email)}" data-name="${esc(u.name)}" data-role="${esc(u.role)}">
-        <div class="member-av">${initials(u.name)}</div>
+        ${u.avatar_url
+          ? `<div class="member-av" style="padding:0;overflow:hidden"><img src="${esc(u.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`
+          : `<div class="member-av">${initials(u.name)}</div>`}
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.name)}</div>
           <div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px">${esc(u.role)}</div>
@@ -478,6 +483,28 @@ function initMemberSearch() {
   input.addEventListener('focus', () => { if (input.value.trim()) run(); });
 }
 
+/* ════════════════════════════════════
+   INBOX FAB — floating message button on every page
+   ════════════════════════════════════ */
+function injectInboxFab() {
+  if (document.querySelector('.inbox-fab')) return;
+  const page = (window.location.pathname.split('/').pop() || '').toLowerCase();
+  if (page.includes('inbox') || page === 'login.html') return;
+
+  const btn = document.createElement('button');
+  btn.className = 'inbox-fab';
+  btn.title = 'Inbox';
+  btn.innerHTML = window.icon('message');
+  document.body.appendChild(btn);
+
+  btn.addEventListener('click', () => {
+    const role = window._apexRole || 'client';
+    const dest = `${role}-inbox.html`;
+    if (typeof apexNavigate === 'function') apexNavigate(dest);
+    else window.location.href = dest;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Render all icons ── */
@@ -485,6 +512,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Profile dropdown ── */
   injectProfileMenu();
+
+  /* ── Inbox FAB ── */
+  injectInboxFab();
 
   /* ── Topbar member search ── */
   initMemberSearch();

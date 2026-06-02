@@ -405,17 +405,47 @@ async function savePost(authorName, authorRole, body, media, authorEmail) {
 
 // ── Social: directory, follows, DMs ────────────────────────
 async function loadDirectory() {
+  const build = (clients, coaches) => {
+    const list = [];
+    (clients || []).forEach(x => x.email && list.push({ name: x.name, email: x.email, role: 'Client', avatar_url: x.avatar_url || null }));
+    (coaches || []).forEach(x => x.email && list.push({ name: x.name, email: x.email, role: 'Coach',  avatar_url: x.avatar_url || null }));
+    return list;
+  };
   try {
     const [c, co] = await Promise.all([
       db.from('clients').select('name,email,avatar_url').order('name'),
       db.from('coaches').select('name,email,avatar_url').order('name'),
     ]);
-    const list = [];
-    (c.data  || []).forEach(x => x.email && list.push({ name: x.name, email: x.email, role: 'Client', avatar_url: x.avatar_url || null }));
-    (co.data || []).forEach(x => x.email && list.push({ name: x.name, email: x.email, role: 'Coach',  avatar_url: x.avatar_url || null }));
-    return list;
+    // If avatar_url column doesn't exist yet, fall back to basic columns
+    if (!c.error && !co.error) return build(c.data, co.data);
+    const [c2, co2] = await Promise.all([
+      db.from('clients').select('name,email').order('name'),
+      db.from('coaches').select('name,email').order('name'),
+    ]);
+    return build(c2.data, co2.data);
   } catch (e) {
     console.warn('[Supabase] loadDirectory:', e.message);
+    return [];
+  }
+}
+
+async function loadConversations(email) {
+  try {
+    const { data, error } = await db.from('messages')
+      .select('*')
+      .or(`sender_email.eq.${email},recipient_email.eq.${email}`)
+      .order('created_at', { ascending: false })
+      .limit(300);
+    if (error) throw error;
+    const convMap = new Map();
+    for (const msg of data || []) {
+      const other = msg.sender_email.toLowerCase() === email.toLowerCase()
+        ? msg.recipient_email : msg.sender_email;
+      if (!convMap.has(other.toLowerCase())) convMap.set(other.toLowerCase(), msg);
+    }
+    return Array.from(convMap.entries()).map(([otherEmail, lastMsg]) => ({ otherEmail, lastMsg }));
+  } catch (e) {
+    console.warn('[Supabase] loadConversations:', e.message);
     return [];
   }
 }
@@ -490,10 +520,9 @@ async function likePost(id, likes) {
 // Members ranked by workouts logged (sessions) — for leaderboard / top athletes
 async function loadCommunityRanking() {
   try {
-    const [{ data: clients }, { data: workouts }] = await Promise.all([
-      db.from('clients').select('id, name, avatar_url'),
-      db.from('workouts').select('client_id'),
-    ]);
+    let { data: clients, error: ce } = await db.from('clients').select('id, name, avatar_url');
+    if (ce) ({ data: clients } = await db.from('clients').select('id, name'));
+    const { data: workouts } = await db.from('workouts').select('client_id');
     const counts = {};
     for (const w of workouts || []) counts[w.client_id] = (counts[w.client_id] || 0) + 1;
     return (clients || [])
@@ -531,6 +560,7 @@ const APEX_PORTAL = {
       { page: 'admin-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'admin-biometrics.html', label: 'Biometrics', icon: 'trending' },
       { page: 'admin-community.html',  label: 'Community',  icon: 'users' },
+      { page: 'admin-inbox.html',      label: 'Inbox',      icon: 'message' },
       { page: 'admin.html',            label: 'Management', icon: 'settings' },
     ],
   },
@@ -542,6 +572,7 @@ const APEX_PORTAL = {
       { page: 'coach-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'coach-biometrics.html', label: 'Biometrics', icon: 'trending' },
       { page: 'coach-community.html',  label: 'Community',  icon: 'users' },
+      { page: 'coach-inbox.html',      label: 'Inbox',      icon: 'message' },
     ],
   },
   client: {
@@ -552,6 +583,7 @@ const APEX_PORTAL = {
       { page: 'client-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'client-biometrics.html', label: 'Biometrics', icon: 'trending' },
       { page: 'client-community.html',  label: 'Community',  icon: 'users' },
+      { page: 'client-inbox.html',      label: 'Inbox',      icon: 'message' },
     ],
   },
 };
@@ -634,6 +666,18 @@ async function initSidebar() {
                  : 'User');
   const nameEl = document.getElementById('sb-admin-name');
   if (nameEl) nameEl.textContent = name;
+
+  // Auto-sync: push avatar from auth metadata → DB so other users can see it.
+  // Runs once per browser session (sessionStorage gate avoids a DB write on every page load).
+  if (m.avatar_url && typeof saveUserAvatar === 'function') {
+    try {
+      const _syncKey = `av_synced_${user.email}`;
+      if (!sessionStorage.getItem(_syncKey)) {
+        sessionStorage.setItem(_syncKey, '1');
+        saveUserAvatar(user.email, m.avatar_url).catch(() => {});
+      }
+    } catch (_) {}
+  }
 
   // Detect role: check if email belongs to a coach or client
   const { data: coachRow } = await db.from('coaches').select('id').eq('email', user.email).maybeSingle();
