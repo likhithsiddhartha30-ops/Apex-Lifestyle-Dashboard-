@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Dashboard</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <!-- Welcome row -->
+    <div class="dash-header">
+      <div>
+        <div class="dash-welcome">Welcome Back, Alex!</div>
+        <div class="dash-sub">System check complete. Performance metrics are trending upward.</div>
+      </div>
+      <span class="badge-green"><span class="pulse"></span>Peak Performance</span>
+    </div>
+
+    <!-- Main: workout hero + ring -->
+    <div class="dash-main">
+
+      <div class="wk-hero">
+        <div class="wk-hero-overlay"></div>
+        <div class="wk-hero-body">
+          <div class="wk-eyebrow">Scheduled for Today</div>
+          <div class="wk-title" id="wk-title">—</div>
+          <div class="wk-desc" id="wk-desc"></div>
+          <div class="wk-footer">
+            <div class="wk-stat" id="wk-stat-1" style="display:none">
+              <span class="lbl" id="wk-stat-1-lbl"></span>
+              <span class="val val-sm" id="wk-stat-1-val"></span>
+            </div>
+            <div class="wk-stat" id="wk-stat-2" style="display:none">
+              <span class="lbl" id="wk-stat-2-lbl"></span>
+              <span class="val val-sm accent" id="wk-stat-2-val"></span>
+            </div>
+            <button class="btn-accent" id="wk-btn">View Workout</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card prog-card">
+        <div class="card-title">Daily Progress</div>
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 150 150">
+            <circle cx="75" cy="75" r="60" fill="none" stroke="var(--border)" stroke-width="11"/>
+            <circle cx="75" cy="75" r="60" fill="none" stroke="var(--accent)" stroke-width="11"
+              stroke-linecap="round" stroke-dasharray="376.99" stroke-dashoffset="376.99"
+              data-offset="376.99" data-circ="376.99"/>
+            <circle cx="75" cy="75" r="46" fill="none" stroke="var(--border)" stroke-width="7"/>
+            <circle cx="75" cy="75" r="46" fill="none" stroke="var(--cyan)" stroke-width="7"
+              stroke-linecap="round" stroke-dasharray="289.03" stroke-dashoffset="289.03"
+              data-offset="289.03" data-circ="289.03"/>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-pct" id="ring-pct">—</div>
+            <div class="ring-sub">This Week</div>
+          </div>
+        </div>
+        <div class="prog-stats">
+          <div class="prog-row"><span class="lbl">Workouts</span><span class="val val-sm" id="stat-workouts">—</span></div>
+          <div class="prog-row"><span class="lbl">Diet</span><span class="val val-sm" id="stat-diet">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom row -->
+    <div class="dash-bottom">
+
+      <!-- Weight Trend -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="card-title" id="trend-title">Weight Trend</div>
+          <span id="trend-arrow" class="green" style="font-size:18px"></span>
+        </div>
+        <div id="bw-log-row" style="display:none;align-items:center;gap:8px;margin:10px 0 4px">
+          <span class="lbl" style="flex-shrink:0">Morning BW</span>
+          <input id="bw-input" type="number" min="0" step="0.1" inputmode="decimal"
+            placeholder="empty-stomach kg"
+            class="form-input" style="flex:1;padding:7px 10px;font-size:13px;font-weight:700">
+          <button id="bw-save" class="btn-accent" style="padding:7px 14px;font-size:12px;white-space:nowrap">Log</button>
+        </div>
+        <div id="bw-hint" style="display:none;font-size:10px;color:var(--t3);margin:0 0 6px">Log your weight first thing, empty stomach, for the most consistent trend.</div>
+        <div id="trend-chart" style="margin-top:14px;min-height:140px"></div>
+        <div class="hrv-footer" id="trend-footer" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Upcoming -->
+      <div class="card">
+        <div class="card-title">Upcoming</div>
+        <div class="events">
+          <div class="event"><div class="event-name" style="color:var(--t2)">Loading…</div></div>
+        </div>
+        <button class="btn-outline" style="width:100%">View Schedule</button>
+      </div>
+
+    </div><!-- /dash-bottom -->
+  </div><!-- /page-content -->
+</main>
+
+<button class="fab">+</button>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const welcomeEl = document.querySelector('.dash-welcome');
+  const subEl     = document.querySelector('.dash-sub');
+  const eventsEl  = document.querySelector('.events');
+  if (welcomeEl) welcomeEl.textContent = '…';
+  if (subEl)     subEl.textContent     = '';
+
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+  const cid = getClientId();
+
+  if (!cid) {
+    const nameEl = document.getElementById('sb-admin-name');
+    const name   = nameEl ? nameEl.textContent.trim() : 'Admin';
+    if (welcomeEl) welcomeEl.textContent = `Welcome Back, ${name.split(' ')[0]}!`;
+    if (subEl) subEl.textContent = 'Select a client to view their dashboard.';
+    document.getElementById('wk-title').textContent = 'No client selected';
+    document.getElementById('wk-desc').textContent  = '';
+    return;
+  }
+
+  // ── 1. Client info ──────────────────────────────────────────
+  let _goal = '';
+  try {
+    const { data: client } = await db.from('clients').select('*').eq('id', cid).single();
+    if (client) {
+      _goal = client.goal || '';
+      if (welcomeEl) welcomeEl.textContent = `Welcome Back, ${client.name.split(' ')[0]}!`;
+      if (subEl) {
+        const since = client.start_date
+          ? ' · Since ' + new Date(client.start_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+          : '';
+        subEl.textContent = client.goal ? `Goal: ${client.goal}${since}` : 'No goal set yet';
+      }
+    }
+  } catch (_) {}
+
+  const today = getTodayIST();
+
+  // ── 2. Today's workout ──────────────────────────────────────
+  try {
+    const w = await loadWorkoutByDate(cid, today);
+    const titleEl = document.getElementById('wk-title');
+    const descEl  = document.getElementById('wk-desc');
+    if (w && w.notes) {
+      const lines = w.notes.split('\n').filter(Boolean);
+      titleEl.textContent = lines[0] || 'Workout';
+      descEl.textContent  = lines.slice(1).join(' · ') || 'Logged for today';
+      const s1 = document.getElementById('wk-stat-1');
+      const s2 = document.getElementById('wk-stat-2');
+      document.getElementById('wk-stat-1-lbl').textContent = 'Date';
+      document.getElementById('wk-stat-1-val').textContent = new Date(today + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      s1.style.display = '';
+      document.getElementById('wk-stat-2-lbl').textContent = 'Notes';
+      document.getElementById('wk-stat-2-val').textContent = lines.length > 1 ? `${lines.length - 1} line${lines.length > 2 ? 's' : ''}` : '—';
+      s2.style.display = '';
+      document.getElementById('wk-btn').textContent = 'View Workout';
+    } else {
+      titleEl.textContent = 'Rest Day';
+      descEl.textContent  = 'No workout scheduled for today — recovery is part of the plan.';
+      document.getElementById('wk-btn').textContent = 'Log a Workout';
+    }
+    document.getElementById('wk-btn').addEventListener('click', () => { window.location.href = 'coach-training.html'; });
+  } catch (_) {}
+
+  // Center % = average of the two rings (orange = workouts, blue = diet)
+  let workoutPct = 0;
+  let dietPct    = 0;
+  const updateCenterPct = () =>
+    document.getElementById('ring-pct').textContent = Math.round((workoutPct + dietPct) / 2) + '%';
+
+  // Monday of the current week (shared by workout + diet rings)
+  const _ws = new Date(today + 'T12:00:00');
+  _ws.setDate(_ws.getDate() - ((_ws.getDay() + 6) % 7));
+  const weekStartStr = `${_ws.getFullYear()}-${String(_ws.getMonth()+1).padStart(2,'0')}-${String(_ws.getDate()).padStart(2,'0')}`;
+
+  // ── 3. Progress ring — ORANGE = workouts this week ──────────
+  try {
+    // Coach-set weekly workout-day target (falls back to 5)
+    let target = 5;
+    try {
+      const { data: c } = await db.from('clients').select('workout_goal').eq('id', cid).single();
+      if (c && c.workout_goal != null) target = Number(c.workout_goal);
+    } catch (_) {}
+
+    const { data: weekWorkouts } = await db.from('workouts')
+      .select('date').eq('client_id', cid)
+      .gte('date', weekStartStr).lte('date', today);
+
+    const count  = new Set((weekWorkouts || []).map(w => w.date)).size;
+    const pct    = Math.min(Math.round((count / target) * 100), 100);
+
+    workoutPct = pct;
+    document.getElementById('stat-workouts').textContent = `${count} / ${target}`;
+
+    const circ   = 376.99;
+    const offset = (circ * (1 - pct / 100)).toFixed(1);
+    const ring   = document.querySelector('[data-circ="376.99"]');
+    if (ring) {
+      ring.dataset.offset = offset;
+      ring.style.transition = 'stroke-dashoffset 0.9s cubic-bezier(0.25,0.46,0.45,0.94) 0.1s';
+      requestAnimationFrame(() => { ring.style.strokeDashoffset = offset; });
+    }
+    updateCenterPct();
+  } catch (_) {}
+
+  // ── 3b. Progress ring — BLUE = diet adherence this week ─────
+  //  (days this week with at least one meal logged, out of 7)
+  try {
+    const { data: weekMeals } = await db.from('meals')
+      .select('date').eq('client_id', cid)
+      .gte('date', weekStartStr).lte('date', today);
+
+    const daysWithMeals = new Set((weekMeals || []).map(m => m.date)).size;
+    const dietTarget    = 7;
+    dietPct = Math.min(Math.round((daysWithMeals / dietTarget) * 100), 100);
+
+    document.getElementById('stat-diet').textContent = `${daysWithMeals} / ${dietTarget}`;
+
+    const dietCirc   = 289.03;
+    const dietOffset = (dietCirc * (1 - dietPct / 100)).toFixed(1);
+    const dietRing   = document.querySelector('[data-circ="289.03"]');
+    if (dietRing) {
+      dietRing.dataset.offset = dietOffset;
+      dietRing.style.transition = 'stroke-dashoffset 0.9s cubic-bezier(0.25,0.46,0.45,0.94) 0.18s';
+      requestAnimationFrame(() => { dietRing.style.strokeDashoffset = dietOffset; });
+    }
+    updateCenterPct();
+  } catch (_) {}
+
+  // Build a clean dated line graph (SVG) from [{date, weight}] ascending
+  function buildWeightChartSVG(points, color) {
+    const W = 320, H = 130, padT = 22, padB = 24, padL = 12, padR = 16;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const weights = points.map(p => p.weight);
+    let minW = Math.min(...weights), maxW = Math.max(...weights);
+    const vpad = (maxW - minW) * 0.18 || 1;          // breathing room top/bottom
+    minW -= vpad; maxW += vpad;
+    const range = maxW - minW || 1;
+    const n = points.length;
+    const X = i => padL + (n === 1 ? plotW / 2 : plotW * i / (n - 1));
+    const Y = w => padT + plotH * (1 - (w - minW) / range);
+
+    const co = points.map((p, i) => ({ x: X(i), y: Y(p.weight), date: p.date, weight: p.weight }));
+    const line = co.map((c, i) => `${i ? 'L' : 'M'}${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ');
+    const area = `${line} L${co[n - 1].x.toFixed(1)} ${padT + plotH} L${co[0].x.toFixed(1)} ${padT + plotH} Z`;
+    const gid  = 'wg' + Math.random().toString(36).slice(2, 7);
+    const fmt  = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const lblIdx = n <= 4 ? co.map((_, i) => i) : [0, Math.floor((n - 1) / 2), n - 1];
+
+    const dots = co.map((c, i) => {
+      const last = i === n - 1;
+      return `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${last ? 4.5 : 3}" fill="${last ? color : 'var(--card)'}" stroke="${color}" stroke-width="2"/>`;
+    }).join('');
+
+    const dateLbls = lblIdx.map(i => {
+      const c = co[i];
+      const anchor = i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle');
+      return `<text x="${c.x.toFixed(1)}" y="${H - 7}" text-anchor="${anchor}" font-size="9" fill="#888" font-family="'Lato',sans-serif">${fmt(c.date)}</text>`;
+    }).join('');
+
+    const valLbls = [...new Set([0, n - 1])].map(i => {
+      const c = co[i];
+      const anchor = (i === 0 && n > 1) ? 'start' : 'end';
+      const yy = c.y - 9 < padT ? c.y + 15 : c.y - 9;
+      return `<text x="${c.x.toFixed(1)}" y="${yy.toFixed(1)}" text-anchor="${anchor}" font-size="10.5" font-weight="800" fill="${i === n - 1 ? color : '#aaa'}" font-family="'Lato',sans-serif">${c.weight.toFixed(1)}</text>`;
+    }).join('');
+
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">
+      <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient></defs>
+      <path d="${area}" fill="url(#${gid})"/>
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}${valLbls}${dateLbls}
+    </svg>`;
+  }
+
+  // ── 4. Check-ins count + weight trend graph ─────────────────
+  async function refreshCheckIns() {
+    const checkIns = await loadCheckIns(cid, 7);
+
+    // ascending by date, only entries that have a weight
+    const withWeight = [...checkIns].reverse().filter(c => c.weight != null)
+      .map(c => ({ date: c.date, weight: parseFloat(c.weight) }));
+
+    const chartEl  = document.getElementById('trend-chart');
+    const footerEl = document.getElementById('trend-footer');
+    const arrowEl  = document.getElementById('trend-arrow');
+
+    if (withWeight.length >= 2) {
+      const weights = withWeight.map(p => p.weight);
+      const first   = weights[0];
+      const last    = weights[weights.length - 1];
+      const change  = last - first;
+      const diff    = change.toFixed(1);
+      const sign    = change > 0 ? '+' : '';
+      const isDown  = change <= 0;
+      // Colour by goal alignment: green = with goal, red = against goal
+      const status  = window.goalStatus ? window.goalStatus(_goal, 'weight', change) : (isDown ? 'good' : 'bad');
+      const color   = window.goalColor ? window.goalColor(status) : (isDown ? 'var(--green)' : 'var(--red)');
+      const cls     = status === 'bad' ? 'red' : 'green';
+      const tag     = _goal ? ` · ${status === 'bad' ? 'off goal' : 'on goal'}` : '';
+
+      if (chartEl) chartEl.innerHTML = buildWeightChartSVG(withWeight, color);
+      if (arrowEl) { arrowEl.textContent = isDown ? '↘' : '↗'; arrowEl.className = cls; }
+      if (footerEl) footerEl.innerHTML =
+        `<span class="muted" style="font-size:11px">Start: ${first.toFixed(1)} kg</span>
+         <span class="${cls}" style="font-size:11px;font-weight:600">Now: ${last.toFixed(1)} kg (${sign}${diff} kg)${tag}</span>`;
+    } else if (withWeight.length === 1) {
+      const only = withWeight[0];
+      const dlbl = new Date(only.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (chartEl) chartEl.innerHTML =
+        `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:130px;gap:6px">
+           <div style="font-size:30px;font-weight:900;color:var(--accent)">${only.weight.toFixed(1)}<span style="font-size:14px;color:var(--t2);font-weight:700"> kg</span></div>
+           <div style="font-size:11px;color:var(--t2)">Logged ${dlbl}</div>
+           <div style="font-size:10px;color:var(--t3)">Log again tomorrow to start your trend line</div>
+         </div>`;
+      if (arrowEl) arrowEl.textContent = '';
+      if (footerEl) footerEl.innerHTML = '';
+    } else {
+      if (chartEl) chartEl.innerHTML =
+        `<div style="display:flex;align-items:center;justify-content:center;height:130px;color:var(--t3);font-size:12px;text-align:center">No bodyweight logged yet —<br>enter your morning weight above to begin.</div>`;
+      if (arrowEl) arrowEl.textContent = '';
+      if (footerEl) footerEl.innerHTML = '';
+    }
+
+    // Pre-fill today's bodyweight if already logged
+    const todays = checkIns.find(c => c.date === today && c.weight != null);
+    const bwInput = document.getElementById('bw-input');
+    if (bwInput && todays) bwInput.value = parseFloat(todays.weight);
+  }
+
+  try {
+    await refreshCheckIns();
+
+    // ── Morning bodyweight logging ──
+    const bwRow   = document.getElementById('bw-log-row');
+    const bwHint  = document.getElementById('bw-hint');
+    const bwInput = document.getElementById('bw-input');
+    const bwSave  = document.getElementById('bw-save');
+    if (bwRow)  bwRow.style.display  = 'flex';
+    if (bwHint) bwHint.style.display = '';
+
+    const doSaveBW = async () => {
+      const val = parseFloat(bwInput.value);
+      if (isNaN(val) || val <= 0) {
+        bwInput.style.borderColor = '#f87171';
+        return;
+      }
+      bwSave.disabled = true; bwSave.textContent = 'Saving…';
+      try {
+        await saveCheckIn(cid, today, { weight: val });
+        bwInput.style.borderColor = 'var(--green)';
+        setTimeout(() => { bwInput.style.borderColor = ''; }, 1000);
+        await refreshCheckIns();
+      } catch (err) {
+        bwInput.style.borderColor = '#f87171';
+      } finally {
+        bwSave.disabled = false; bwSave.textContent = 'Log';
+      }
+    };
+    if (bwSave)  bwSave.addEventListener('click', doSaveBW);
+    if (bwInput) bwInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doSaveBW(); } });
+  } catch (_) {}
+
+  // ── 5. Recent workouts list ─────────────────────────────────
+  try {
+    document.querySelectorAll('.card-title').forEach(el => {
+      if (el.textContent.trim() === 'Upcoming') el.textContent = 'Recent Workouts';
+    });
+
+    const workouts = await loadWorkouts(cid, 2);
+    if (eventsEl) {
+      eventsEl.innerHTML = workouts.length
+        ? workouts.map(w => {
+            const lines = w.notes ? w.notes.split('\n').filter(Boolean) : [];
+            return `
+            <div class="event">
+              <div class="event-time">${new Date(w.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+              <div class="event-name">${lines[0] || 'Workout Session'}</div>
+              <div class="event-loc">${lines[1] ? lines[1].slice(0, 55) + (lines[1].length > 55 ? '…' : '') : 'No details logged'}</div>
+            </div>`;
+          }).join('')
+        : '<div class="event"><div class="event-name" style="color:var(--t2)">No workouts logged yet</div></div>';
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

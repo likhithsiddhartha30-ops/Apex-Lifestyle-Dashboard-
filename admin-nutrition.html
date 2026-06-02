@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Nutrition</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search food database...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <div class="nut-header">
+      <div>
+        <div class="pg-eyebrow">Fueling Strategy</div>
+        <div class="pg-title" style="margin-bottom:0">Fueling Plan</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:5px">Optimal nutrient distribution for 48h recovery cycle.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="date" class="form-input" id="nut-date" style="padding:8px 12px;font-size:12px;width:160px">
+        <button class="btn-outline" id="extend-plan-btn" style="white-space:nowrap;padding:10px 16px;display:flex;align-items:center;gap:6px">
+          <span data-icon="share" style="display:flex;align-items:center"></span> Extend Plan
+        </button>
+        <button class="btn-accent" id="add-meal-btn" style="white-space:nowrap;padding:10px 18px">+ Add Meal</button>
+      </div>
+    </div>
+
+    <div class="nut-grid">
+
+      <!-- Calorie card -->
+      <div class="cal-card">
+        <div class="cal-wm">APEX</div>
+        <div class="cal-remain">Calories Consumed</div>
+        <div class="cal-num">0 <span class="cal-unit">kcal</span></div>
+        <div class="cal-breakdown">
+          <div class="cal-item" style="display:flex;align-items:center;gap:8px">
+            <span class="lbl">Daily Goal</span>
+            <span class="val val-md" id="cal-goal-lbl">—</span>
+            <button id="set-goals-btn" class="open-goals-btn" title="Set Goals"
+              style="background:rgba(255,117,31,.08);border:1px solid rgba(255,117,31,.25);
+                     cursor:pointer;color:var(--accent);padding:4px 10px;border-radius:6px;
+                     display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
+                     letter-spacing:.5px;text-transform:uppercase;transition:background .15s"
+              onmouseover="this.style.background='rgba(255,117,31,.18)'"
+              onmouseout="this.style.background='rgba(255,117,31,.08)'">
+              <span data-icon="edit" style="display:flex;align-items:center"></span> Set Goals
+            </button>
+          </div>
+        </div>
+        <div class="cal-ring-wrap">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="56" fill="none" stroke="var(--border)" stroke-width="12"/>
+            <circle cx="70" cy="70" r="56" fill="none" stroke="var(--accent)" stroke-width="12"
+              id="cal-ring-circle"
+              stroke-linecap="round" transform="rotate(-90 70 70)"
+              stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+            <text id="cal-ring-num" x="70" y="65" text-anchor="middle" font-family="'Lato',sans-serif"
+              font-size="20" font-weight="900" fill="white">0%</text>
+            <text id="cal-ring-lbl" x="70" y="79" text-anchor="middle" font-family="'Lato',sans-serif"
+              font-size="9" fill="#888" letter-spacing="1">TOTAL</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="nut-right">
+
+        <div class="hydro-card">
+          <div class="hydro-header">
+            <span class="lbl">Hydration Status</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="cyan" style="font-size:18px" data-icon="droplet"></span>
+              <button class="open-goals-btn" title="Set water goal"
+                style="background:none;border:none;cursor:pointer;color:var(--t2);padding:3px;
+                       border-radius:5px;display:flex;align-items:center"
+                onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--t2)'"
+                data-icon="edit"></button>
+            </div>
+          </div>
+          <div class="hydro-val"><span class="hydro-current">0</span> <span>/ <span id="hydro-goal-lbl">4.0</span> Liters</span></div>
+          <div class="bar-track">
+            <div class="bar-fill hydro-fill" data-w="0%" style="background:var(--cyan);width:0%"></div>
+          </div>
+          <div class="hydro-btns">
+            <button class="hydro-btn" data-add="250">+250ml</button>
+            <button class="hydro-btn" data-add="500">+500ml</button>
+            <button class="hydro-btn" id="hydro-reset" data-add="0"
+              style="background:none;border:1px solid var(--border);color:var(--t2);font-size:10px">Reset</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Macronutrients</span>
+            <button class="open-goals-btn" title="Set macro targets"
+              style="background:none;border:none;cursor:pointer;color:var(--t2);padding:3px;
+                     border-radius:5px;display:flex;align-items:center"
+              onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--t2)'"
+              data-icon="edit"></button>
+          </div>
+          <div class="macro-list">
+            <div class="macro-row">
+              <div class="macro-dot" style="background:var(--accent)"></div>
+              <span class="macro-name">Protein</span>
+              <div class="macro-track">
+                <div class="bar-track"><div class="bar-fill" data-w="0%" style="background:var(--accent);width:0"></div></div>
+              </div>
+              <span class="macro-vals">— / —</span>
+            </div>
+            <div class="macro-row">
+              <div class="macro-dot" style="background:var(--cyan)"></div>
+              <span class="macro-name">Carbs</span>
+              <div class="macro-track">
+                <div class="bar-track"><div class="bar-fill" data-w="0%" style="background:var(--cyan);width:0"></div></div>
+              </div>
+              <span class="macro-vals">— / —</span>
+            </div>
+            <div class="macro-row">
+              <div class="macro-dot" style="background:var(--green)"></div>
+              <span class="macro-name">Fats</span>
+              <div class="macro-track">
+                <div class="bar-track"><div class="bar-fill" data-w="0%" style="background:var(--green);width:0"></div></div>
+              </div>
+              <span class="macro-vals">— / —</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /nut-grid -->
+
+    <!-- Meals -->
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span>Daily Meals</span>
+      <span id="meal-total-lbl" style="font-size:11px;color:var(--t2);font-weight:600"></span>
+    </div>
+    <div class="meal-list" id="meal-list">
+      <div style="padding:28px;text-align:center;color:var(--t2);font-size:13px">Loading…</div>
+    </div>
+
+
+  </div>
+</main>
+
+<button class="fab">+</button>
+
+<!-- Set Goals panel -->
+<div class="form-overlay" id="goals-overlay"></div>
+<div class="form-panel" id="goals-panel">
+  <div class="form-panel-head">
+    <div class="form-panel-title">Set Daily Goals</div>
+    <button class="form-close" id="goals-close">✕</button>
+  </div>
+  <form id="goals-form" class="client-form">
+    <div class="form-group">
+      <label class="form-label">Training Goal</label>
+      <select class="form-input" id="gf-goal">
+        <option value="">Not set</option>
+        <option value="Fat Loss">Fat Loss</option>
+        <option value="Cutting">Cutting</option>
+        <option value="Bulking">Bulking</option>
+        <option value="Body Recomp">Body Recomp</option>
+        <option value="Maintenance">Maintenance</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Calories (kcal) *</label>
+      <input class="form-input" id="gf-calories" type="number" min="0" placeholder="e.g. 2500" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Protein (g)</label>
+      <input class="form-input" id="gf-protein" type="number" min="0" placeholder="e.g. 180">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Carbs (g)</label>
+      <input class="form-input" id="gf-carbs" type="number" min="0" placeholder="e.g. 250">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fats (g)</label>
+      <input class="form-input" id="gf-fats" type="number" min="0" placeholder="e.g. 75">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Water Goal (Liters)</label>
+      <input class="form-input" id="gf-water" type="number" min="0" step="0.5" placeholder="e.g. 4.0">
+    </div>
+    <div id="goals-err" class="login-err"></div>
+    <div class="form-actions">
+      <button class="btn-outline" type="button" id="goals-cancel">Cancel</button>
+      <button class="btn-accent"  type="submit" id="goals-submit">Save Goals</button>
+    </div>
+  </form>
+</div>
+
+<!-- Extend Plan panel -->
+<div class="form-overlay" id="extend-overlay"></div>
+<div class="form-panel" id="extend-panel">
+  <div class="form-panel-head">
+    <div class="form-panel-title">Extend Diet Plan</div>
+    <button class="form-close" id="extend-close">✕</button>
+  </div>
+  <form id="extend-form" class="client-form">
+    <div style="font-size:12px;color:var(--t2);margin-bottom:16px;padding:0 2px">
+      Copying macro goals (and any meals) from <strong id="extend-source-lbl" style="color:var(--accent)">—</strong>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Repeat From *</label>
+      <input class="form-input" id="ef-from" type="date" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Repeat To *</label>
+      <input class="form-input" id="ef-to" type="date" required>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" id="ef-replace" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0">
+        <span style="font-size:12px;color:var(--t2);line-height:1.4">Replace existing meals on those dates</span>
+      </label>
+    </div>
+    <div id="extend-status" style="font-size:12px;color:var(--cyan);min-height:18px;margin-bottom:4px"></div>
+    <div id="extend-err" class="login-err"></div>
+    <div class="form-actions">
+      <button class="btn-outline" type="button" id="extend-cancel">Cancel</button>
+      <button class="btn-accent"  type="submit" id="extend-submit">Extend Plan</button>
+    </div>
+  </form>
+</div>
+
+<!-- Add / Edit meal panel -->
+<div class="form-overlay" id="meal-overlay"></div>
+<div class="form-panel" id="meal-panel">
+  <div class="form-panel-head">
+    <div class="form-panel-title" id="meal-panel-title">Add Meal</div>
+    <button class="form-close" id="mf-close">✕</button>
+  </div>
+  <form id="meal-form" class="client-form">
+    <div class="form-group">
+      <label class="form-label">Meal Name *</label>
+      <input class="form-input" id="mf-name" type="text" placeholder="e.g. Athlete's Morning Power Bowl" required>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Time</label>
+        <input class="form-input" id="mf-time" type="text" placeholder="07:30 AM">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Calories (kcal) *</label>
+        <input class="form-input" id="mf-calories" type="number" min="0" step="1" placeholder="450" required>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Protein (g)</label>
+        <input class="form-input" id="mf-protein" type="number" min="0" step="0.1" placeholder="45">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carbs (g)</label>
+        <input class="form-input" id="mf-carbs" type="number" min="0" step="0.1" placeholder="52">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fats (g)</label>
+        <input class="form-input" id="mf-fats" type="number" min="0" step="0.1" placeholder="12">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ingredients / Notes</label>
+      <textarea class="form-input" id="mf-ingredients" rows="4"
+        placeholder="Oats, Whey Isolate, Berries, Almond Butter…"
+        style="resize:vertical;line-height:1.6;min-height:90px"></textarea>
+    </div>
+    <div id="mf-err" style="font-size:12px;color:#f87171;min-height:16px"></div>
+    <div class="form-actions">
+      <button type="button" class="btn-outline" id="mf-cancel">Cancel</button>
+      <button type="submit" class="btn-accent" id="mf-submit">Save Meal</button>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+// Effective goals for the currently-viewed date (per-date override, else client default)
+let _calGoal  = null;
+let _protGoal = null;
+let _carbGoal = null;
+let _fatGoal  = null;
+let _waterGoalML = 4000;
+
+// Per-client fallback defaults (from Admin / clients table)
+let _defCal = null, _defProt = null, _defCarb = null, _defFat = null, _defWater = 4000;
+let _clientGoal = '';
+
+let _nutCid        = null;
+let _nutDate       = getTodayIST();
+let _editingMealId = null;
+
+/* ── Form open / close ──────────────────────────────────── */
+function openMealForm(meal = null) {
+  _editingMealId = meal ? meal.id : null;
+  document.getElementById('meal-panel-title').textContent  = meal ? 'Edit Meal' : 'Add Meal';
+  document.getElementById('mf-name').value        = meal ? (meal.name        || '') : '';
+  document.getElementById('mf-time').value        = meal ? (meal.time        || '') : '';
+  document.getElementById('mf-calories').value    = meal ? (meal.calories    || '') : '';
+  document.getElementById('mf-protein').value     = meal ? (meal.protein     || '') : '';
+  document.getElementById('mf-carbs').value       = meal ? (meal.carbs       || '') : '';
+  document.getElementById('mf-fats').value        = meal ? (meal.fats        || '') : '';
+  document.getElementById('mf-ingredients').value = meal ? (meal.ingredients || '') : '';
+  document.getElementById('mf-err').textContent   = '';
+  document.getElementById('mf-submit').textContent = 'Save Meal';
+  document.getElementById('meal-overlay').classList.add('open');
+  document.getElementById('meal-panel').classList.add('open');
+  document.getElementById('mf-name').focus();
+}
+
+function closeMealForm() {
+  document.getElementById('meal-overlay').classList.remove('open');
+  document.getElementById('meal-panel').classList.remove('open');
+}
+
+/* ── Render ──────────────────────────────────────────────── */
+async function renderNutrition() {
+  const calNumEl   = document.querySelector('.cal-num');
+  const svgPctText = document.querySelector('.cal-ring-wrap svg text');
+  const mealListEl = document.getElementById('meal-list');
+  const totalLbl   = document.getElementById('meal-total-lbl');
+
+  if (mealListEl) mealListEl.innerHTML = '<div style="padding:28px;text-align:center;color:var(--t2);font-size:13px">Loading…</div>';
+
+  const meals = await loadMeals(_nutCid, _nutDate);
+
+  /* Totals from individual meals */
+  const consumed = meals.reduce((s, m) => s + (Number(m.calories) || 0), 0);
+  const protein  = meals.reduce((s, m) => s + (Number(m.protein)  || 0), 0);
+  const carbs    = meals.reduce((s, m) => s + (Number(m.carbs)    || 0), 0);
+  const fats     = meals.reduce((s, m) => s + (Number(m.fats)     || 0), 0);
+
+  const goalsSet = _calGoal != null;
+  const pct      = goalsSet ? Math.min(Math.round(consumed / _calGoal  * 100), 100) : 0;
+  const protPct  = _protGoal ? Math.min(Math.round(protein / _protGoal * 100), 100) : 0;
+  const carbPct  = _carbGoal ? Math.min(Math.round(carbs   / _carbGoal * 100), 100) : 0;
+  const fatPct   = _fatGoal  ? Math.min(Math.round(fats    / _fatGoal  * 100), 100) : 0;
+
+  if (calNumEl)   calNumEl.innerHTML     = `${consumed.toLocaleString()} <span class="cal-unit">kcal</span>`;
+  const goalLbl = document.getElementById('cal-goal-lbl');
+  if (goalLbl)    goalLbl.textContent    = goalsSet ? `${_calGoal.toLocaleString()} kcal` : 'Not set by coach';
+  if (totalLbl)   totalLbl.textContent   = meals.length ? `${meals.length} meal${meals.length > 1 ? 's' : ''} · ${consumed.toLocaleString()} kcal total` : '';
+
+  // Ring centre: % of goal when a goal exists, otherwise the consumed kcal total
+  const ringNum = document.getElementById('cal-ring-num');
+  const ringLbl = document.getElementById('cal-ring-lbl');
+  if (ringNum) ringNum.textContent = goalsSet ? `${pct}%` : (meals.length ? consumed.toLocaleString() : '—');
+  if (ringLbl) ringLbl.textContent = goalsSet ? 'TOTAL' : (meals.length ? 'KCAL' : 'TOTAL');
+
+  // Ring fill: relative to goal. No goal = no denominator, so leave empty
+  // (matches the macro bars, which also show grams without a fill when goal-less)
+  const calRing  = document.getElementById('cal-ring-circle');
+  const ringFill = goalsSet ? pct : 0;
+  if (calRing) {
+    const ringOffset = (351.86 * (1 - ringFill / 100)).toFixed(1);
+    calRing.style.transition = 'stroke-dashoffset 0.9s cubic-bezier(0.25,0.46,0.45,0.94) 0.1s';
+    requestAnimationFrame(() => { calRing.style.strokeDashoffset = ringOffset; });
+  }
+
+  const macroRows = document.querySelectorAll('.macro-row');
+  [[protPct, protein, _protGoal], [carbPct, carbs, _carbGoal], [fatPct, fats, _fatGoal]].forEach(([p, val, goal], i) => {
+    const row = macroRows[i];
+    if (!row) return;
+    const bar  = row.querySelector('.bar-fill');
+    const vals = row.querySelector('.macro-vals');
+    if (bar)  { bar.dataset.w = goal ? p + '%' : '0%'; bar.style.width = bar.dataset.w; }
+    if (vals)   vals.textContent = goal ? `${val}g / ${goal}g` : `${val}g`;
+  });
+
+  if (!mealListEl) return;
+  if (!meals.length) {
+    const dateLabel = new Date(_nutDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    mealListEl.innerHTML = `<div style="padding:28px;text-align:center;color:var(--t2);font-size:13px">No meals for ${dateLabel} — click <strong style="color:var(--accent)">+ Add Meal</strong> to get started.</div>`;
+    return;
+  }
+
+  mealListEl.innerHTML = meals.map((m, i) => {
+    const done = !!m.done;
+    return `
+    <div class="meal-item" data-order="${i}" data-done="${done ? 1 : 0}" style="transition:opacity .25s${done ? ';opacity:.55' : ''}">
+      <input type="checkbox" class="meal-check" data-idx="${i}" ${done ? 'checked' : ''} title="Mark as eaten"
+        style="width:19px;height:19px;flex-shrink:0;align-self:center;accent-color:var(--green);cursor:pointer">
+      <div class="meal-img">${icon('utensils')}</div>
+      <div class="meal-info">
+        ${m.time ? `<div class="meal-time">${m.time}</div>` : ''}
+        <div class="meal-name" style="${done ? 'text-decoration:line-through;color:var(--t2)' : ''}">${m.name}</div>
+        ${m.ingredients ? `<div class="meal-ing">${m.ingredients}</div>` : ''}
+        <div class="meal-macros">
+          ${m.protein ? `<span class="macro-pill prot">P: ${m.protein}g</span>` : ''}
+          ${m.carbs   ? `<span class="macro-pill carb">C: ${m.carbs}g</span>`   : ''}
+          ${m.fats    ? `<span class="macro-pill fat">F: ${m.fats}g</span>`     : ''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="meal-cals">${Number(m.calories || 0).toLocaleString()}</div>
+        <div class="meal-unit">kcal</div>
+        <div class="meal-acts">
+          <button class="mact edit-btn" data-idx="${i}">${icon('edit')}</button>
+          <button class="mact delete del-btn" data-idx="${i}">${icon('trash')}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Sink eaten meals to the bottom (uneaten first, original order within group)
+  const reorderMeals = () => {
+    Array.from(mealListEl.querySelectorAll('.meal-item'))
+      .sort((a, b) => (+a.dataset.done - +b.dataset.done) || (+a.dataset.order - +b.dataset.order))
+      .forEach(it => mealListEl.appendChild(it));
+  };
+  reorderMeals();
+
+  // Tick = eaten → strike through, dim, sink, persist
+  mealListEl.querySelectorAll('.meal-check').forEach(chk =>
+    chk.addEventListener('change', async () => {
+      const meal = meals[chk.dataset.idx];
+      const item = chk.closest('.meal-item');
+      const done = chk.checked;
+      item.dataset.done = done ? 1 : 0;
+      item.style.opacity = done ? '.55' : '';
+      const nameEl = item.querySelector('.meal-name');
+      if (nameEl) {
+        nameEl.style.textDecoration = done ? 'line-through' : '';
+        nameEl.style.color = done ? 'var(--t2)' : '';
+      }
+      reorderMeals();
+      try { await updateMeal(meal.id, { done }); } catch (_) {}
+    }));
+
+  mealListEl.querySelectorAll('.edit-btn').forEach(btn =>
+    btn.addEventListener('click', () => openMealForm(meals[btn.dataset.idx])));
+
+  mealListEl.querySelectorAll('.del-btn').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      if (!confirm(`Delete "${meals[btn.dataset.idx].name}"?`)) return;
+      try {
+        await deleteMeal(meals[btn.dataset.idx].id);
+        await renderNutrition();
+      } catch (err) { alert('Delete failed: ' + err.message); }
+    }));
+}
+
+/* ── Init ────────────────────────────────────────────────── */
+(window._apexPageInit = async () => {
+  const calNumEl   = document.querySelector('.cal-num');
+  const svgPctText = document.querySelector('.cal-ring-wrap svg text');
+  if (calNumEl)    calNumEl.innerHTML      = '— <span class="cal-unit">kcal</span>';
+  document.querySelectorAll('.macro-vals').forEach(el => el.textContent = '— / —');
+  document.querySelectorAll('.macro-row .bar-fill').forEach(b => { b.style.width = '0%'; });
+  if (svgPctText)  svgPctText.textContent  = '—%';
+
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+  _nutCid = getClientId();
+  if (!_nutCid) return;
+
+  // Load per-client default goals (baseline, from Admin)
+  try {
+    const { data: client } = await db.from('clients')
+      .select('cal_goal, protein_goal, carbs_goal, fat_goal, water_goal_ml, goal')
+      .eq('id', _nutCid).single();
+    if (client) {
+      _defCal   = client.cal_goal      != null ? Number(client.cal_goal)      : null;
+      _defProt  = client.protein_goal  != null ? Number(client.protein_goal)  : null;
+      _defCarb  = client.carbs_goal    != null ? Number(client.carbs_goal)    : null;
+      _defFat   = client.fat_goal      != null ? Number(client.fat_goal)      : null;
+      _defWater = client.water_goal_ml != null ? Number(client.water_goal_ml) : 4000;
+      _clientGoal = client.goal || '';
+    }
+  } catch (_) {}
+
+  // Set the effective goals for a date: per-date override if it exists, else the client default
+  async function applyGoalsForDate(date) {
+    const dg = await loadDailyGoals(_nutCid, date);
+    _calGoal     = dg && dg.cal_goal      != null ? Number(dg.cal_goal)      : _defCal;
+    _protGoal    = dg && dg.protein_goal  != null ? Number(dg.protein_goal)  : _defProt;
+    _carbGoal    = dg && dg.carbs_goal    != null ? Number(dg.carbs_goal)    : _defCarb;
+    _fatGoal     = dg && dg.fat_goal      != null ? Number(dg.fat_goal)      : _defFat;
+    _waterGoalML = dg && dg.water_goal_ml != null ? Number(dg.water_goal_ml) : _defWater;
+  }
+
+  /* ── Date picker ─────────────────────────────────────────── */
+  const datePicker = document.getElementById('nut-date');
+  _nutDate         = getTodayIST();
+  datePicker.value = _nutDate;
+  await applyGoalsForDate(_nutDate);
+  datePicker.addEventListener('change', async () => {
+    _nutDate = datePicker.value;
+    await applyGoalsForDate(_nutDate);
+    await initWater();
+    updateHydroUI();
+    renderNutrition();
+  });
+
+  /* ── Hydration (DB-persisted) ─────────────────────────────  */
+  let _waterML = 0;
+
+  function updateHydroUI() {
+    const fill    = document.querySelector('.hydro-fill');
+    const val     = document.querySelector('.hydro-current');
+    const goalLbl = document.getElementById('hydro-goal-lbl');
+    if (fill)    fill.style.width = (_waterGoalML > 0 ? _waterML / _waterGoalML * 100 : 0).toFixed(1) + '%';
+    if (val)     val.textContent  = (_waterML / 1000).toFixed(1);
+    if (goalLbl) goalLbl.textContent = (_waterGoalML / 1000).toFixed(1);
+  }
+
+  async function initWater() {
+    _waterML = await loadWaterLog(_nutCid, _nutDate);
+    updateHydroUI();
+  }
+
+  window._onHydroAdd = async (addMl) => {
+    if (addMl === 0) { _waterML = 0; }                          // Reset button
+    else _waterML = Math.min(_waterML + addMl, _waterGoalML);
+    updateHydroUI();
+    document.querySelectorAll('.hydro-btn').forEach(b => {
+      b.style.transform = 'scale(0.95)';
+      setTimeout(() => b.style.transform = '', 150);
+    });
+    await saveWaterLog(_nutCid, _nutDate, _waterML);
+  };
+
+  await initWater();
+
+  /* ── Set Goals panel ──────────────────────────────────────  */
+  function openGoalsPanel() {
+    document.getElementById('gf-goal').value     = _clientGoal   || '';
+    document.getElementById('gf-calories').value = _calGoal      ?? '';
+    document.getElementById('gf-protein').value  = _protGoal     ?? '';
+    document.getElementById('gf-carbs').value    = _carbGoal     ?? '';
+    document.getElementById('gf-fats').value     = _fatGoal      ?? '';
+    document.getElementById('gf-water').value    = _waterGoalML  ? (_waterGoalML / 1000) : '';
+    document.getElementById('goals-err').textContent = '';
+    document.getElementById('goals-overlay').classList.add('open');
+    document.getElementById('goals-panel').classList.add('open');
+    document.getElementById('gf-calories').focus();
+  }
+  function closeGoalsPanel() {
+    document.getElementById('goals-overlay').classList.remove('open');
+    document.getElementById('goals-panel').classList.remove('open');
+  }
+
+  document.querySelectorAll('.open-goals-btn').forEach(btn =>
+    btn.addEventListener('click', openGoalsPanel));
+  document.getElementById('goals-close').addEventListener('click', closeGoalsPanel);
+  document.getElementById('goals-cancel').addEventListener('click', closeGoalsPanel);
+  document.getElementById('goals-overlay').addEventListener('click', closeGoalsPanel);
+
+  document.getElementById('goals-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn   = document.getElementById('goals-submit');
+    const errEl = document.getElementById('goals-err');
+    btn.disabled = true; btn.textContent = 'Saving…'; errEl.textContent = '';
+    const cal   = parseFloat(document.getElementById('gf-calories').value) || null;
+    const prot  = parseFloat(document.getElementById('gf-protein').value)  || null;
+    const carb  = parseFloat(document.getElementById('gf-carbs').value)    || null;
+    const fat   = parseFloat(document.getElementById('gf-fats').value)     || null;
+    const water = parseFloat(document.getElementById('gf-water').value);
+    const waterML = !isNaN(water) && water > 0 ? Math.round(water * 1000) : null;
+    const trainingGoal = document.getElementById('gf-goal').value || null;
+    const goals = { cal_goal: cal, protein_goal: prot, carbs_goal: carb, fat_goal: fat, water_goal_ml: waterML };
+    try {
+      // Per-date macro entry (extendable to further days) + client baseline.
+      // The training goal lives only on the client record (not per-date).
+      await saveDailyGoals(_nutCid, _nutDate, goals);
+      try { await updateClientGoals(_nutCid, { ...goals, goal: trainingGoal }); } catch (_) {}
+
+      _calGoal = cal; _protGoal = prot; _carbGoal = carb; _fatGoal = fat;
+      _defCal = cal; _defProt = prot; _defCarb = carb; _defFat = fat;
+      _waterGoalML = waterML || 4000;
+      _defWater = waterML || 4000;
+      _clientGoal = trainingGoal || '';
+      updateHydroUI();
+      closeGoalsPanel();
+      await renderNutrition();
+    } catch (err) {
+      errEl.textContent = err.message || 'Save failed.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save Goals';
+    }
+  });
+
+  await renderNutrition();
+
+  /* ── Extend Plan panel ────────────────────────────────────  */
+  function openExtendPanel() {
+    const srcDate  = new Date(_nutDate + 'T00:00:00');
+    const fromDate = new Date(srcDate); fromDate.setDate(fromDate.getDate() + 1);
+    const toDate   = new Date(srcDate); toDate.setDate(toDate.getDate() + 7);
+
+    document.getElementById('extend-source-lbl').textContent =
+      srcDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    document.getElementById('ef-from').value    = fromDate.toISOString().split('T')[0];
+    document.getElementById('ef-to').value      = toDate.toISOString().split('T')[0];
+    document.getElementById('ef-replace').checked       = false;
+    document.getElementById('extend-status').textContent = '';
+    document.getElementById('extend-err').textContent    = '';
+    document.getElementById('extend-overlay').classList.add('open');
+    document.getElementById('extend-panel').classList.add('open');
+  }
+  function closeExtendPanel() {
+    document.getElementById('extend-overlay').classList.remove('open');
+    document.getElementById('extend-panel').classList.remove('open');
+  }
+
+  document.getElementById('extend-plan-btn').addEventListener('click', openExtendPanel);
+  document.getElementById('extend-close').addEventListener('click', closeExtendPanel);
+  document.getElementById('extend-cancel').addEventListener('click', closeExtendPanel);
+  document.getElementById('extend-overlay').addEventListener('click', closeExtendPanel);
+
+  document.getElementById('extend-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn    = document.getElementById('extend-submit');
+    const errEl  = document.getElementById('extend-err');
+    const status = document.getElementById('extend-status');
+    btn.disabled = true; btn.textContent = 'Extending…';
+    errEl.textContent = ''; status.textContent = '';
+
+    const fromStr = document.getElementById('ef-from').value;
+    const toStr   = document.getElementById('ef-to').value;
+    const replace = document.getElementById('ef-replace').checked;
+
+    if (fromStr > toStr) {
+      errEl.textContent = '"Repeat From" must be before "Repeat To".';
+      btn.disabled = false; btn.textContent = 'Extend Plan'; return;
+    }
+
+    try {
+      const sourceMeals = await loadMeals(_nutCid, _nutDate);
+
+      // Goals of the source day (carried to each target date)
+      const goalsPayload = {
+        cal_goal: _calGoal, protein_goal: _protGoal, carbs_goal: _carbGoal,
+        fat_goal: _fatGoal, water_goal_ml: _waterGoalML,
+      };
+      const hasGoals = _calGoal != null || _protGoal != null || _carbGoal != null || _fatGoal != null;
+
+      if (!sourceMeals.length && !hasGoals) {
+        errEl.textContent = 'Nothing to extend — set goals or add a meal on this day first.';
+        btn.disabled = false; btn.textContent = 'Extend Plan'; return;
+      }
+
+      // Build list of target dates
+      const dates = [];
+      let cur = new Date(fromStr + 'T00:00:00');
+      const end = new Date(toStr + 'T00:00:00');
+      while (cur <= end) {
+        const d = cur.toISOString().split('T')[0];
+        if (d !== _nutDate) dates.push(d);
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      let done = 0, mealsSkipped = 0;
+      for (const date of dates) {
+        // Meals — only when the source day has meals; respect the replace toggle
+        if (sourceMeals.length) {
+          const existing = await loadMeals(_nutCid, date);
+          if (existing.length > 0 && !replace) {
+            mealsSkipped++;
+          } else {
+            if (existing.length > 0) await Promise.all(existing.map(m => deleteMeal(m.id)));
+            await Promise.all(sourceMeals.map(m => saveMeal(_nutCid, date, {
+              name: m.name, time: m.time,
+              calories: m.calories, protein: m.protein,
+              carbs: m.carbs, fats: m.fats,
+              ingredients: m.ingredients,
+            })));
+          }
+        }
+        // Goals — always carried to every target date
+        if (hasGoals) await saveDailyGoals(_nutCid, date, goalsPayload);
+        done++;
+        status.textContent = `Extending… ${done} of ${dates.length} dates`;
+      }
+
+      const what = sourceMeals.length ? 'meals + goals' : 'goals';
+      status.textContent = `✓ Extended ${what} to ${done} date${done !== 1 ? 's' : ''}${mealsSkipped ? ` · meals skipped on ${mealsSkipped} (already had meals)` : ''}`;
+      btn.textContent = 'Done ✓';
+      setTimeout(closeExtendPanel, 2000);
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed. Please try again.';
+      btn.disabled = false; btn.textContent = 'Extend Plan';
+    }
+  });
+
+  /* ── Meal panel open / close ──────────────────────────────  */
+  document.getElementById('add-meal-btn').addEventListener('click', () => openMealForm());
+  document.getElementById('mf-close').addEventListener('click', closeMealForm);
+  document.getElementById('mf-cancel').addEventListener('click', closeMealForm);
+  document.getElementById('meal-overlay').addEventListener('click', closeMealForm);
+
+  /* Form submit */
+  document.getElementById('meal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn  = document.getElementById('mf-submit');
+    const errEl      = document.getElementById('mf-err');
+
+    const name        = document.getElementById('mf-name').value.trim();
+    const time        = document.getElementById('mf-time').value.trim()        || null;
+    const calories    = parseFloat(document.getElementById('mf-calories').value)    || 0;
+    const protein     = parseFloat(document.getElementById('mf-protein').value)     || 0;
+    const carbs       = parseFloat(document.getElementById('mf-carbs').value)       || 0;
+    const fats        = parseFloat(document.getElementById('mf-fats').value)        || 0;
+    const ingredients = document.getElementById('mf-ingredients').value.trim() || null;
+
+    errEl.textContent = '';
+    if (!name) { errEl.textContent = 'Please enter a meal name.'; return; }
+
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Saving…';
+    try {
+      if (_editingMealId) {
+        await updateMeal(_editingMealId, { name, time, calories, protein, carbs, fats, ingredients });
+      } else {
+        await saveMeal(_nutCid, _nutDate, { name, time, calories, protein, carbs, fats, ingredients });
+      }
+      closeMealForm();
+      await renderNutrition();
+    } catch (err) {
+      errEl.textContent = err.message || 'Save failed. Please try again.';
+    } finally {
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Save Meal';
+    }
+  });
+})();
+</script>
+</body>
+</html>

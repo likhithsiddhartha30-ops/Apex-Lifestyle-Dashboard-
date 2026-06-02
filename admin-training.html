@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Training</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search movements...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="pg-eyebrow">Workout Protocol</div>
+    <div class="pg-title">Training Protocol</div>
+    <div class="pg-sub">Hypertrophy Phase 2 · Week 4 of 6</div>
+
+    <!-- Day selector -->
+    <div class="day-row">
+      <div class="day-btn active"><span class="day-dname">Mon</span><span class="day-dnum">18</span></div>
+      <div class="day-btn"><span class="day-dname">Tue</span><span class="day-dnum">19</span></div>
+      <div class="day-btn"><span class="day-dname">Wed</span><span class="day-dnum">20</span></div>
+      <div class="day-btn"><span class="day-dname">Thu</span><span class="day-dnum">21</span></div>
+      <div class="day-btn"><span class="day-dname">Fri</span><span class="day-dnum">22</span></div>
+      <div class="day-btn"><span class="day-dname">Sat</span><span class="day-dnum">23</span></div>
+      <div class="day-btn"><span class="day-dname">Sun</span><span class="day-dnum">24</span></div>
+    </div>
+
+    <div class="train-grid">
+      <!-- Left: exercises -->
+      <div>
+        <div class="ex-header">
+          <div class="ex-header-left">
+            <div class="ex-type-icon" data-icon="dumbbell"></div>
+            <div class="ex-header-name">Push B: Chest &amp; Shoulders</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="est-badge" id="est-badge">Estimated: 75 min</div>
+            <button class="btn-accent" id="assign-workout-btn" style="font-size:11px;padding:7px 14px;white-space:nowrap">Assign Workout</button>
+          </div>
+        </div>
+
+        <div class="ex-list">
+
+          <div class="ex-card"><div class="ex-info"><div class="ex-top"><span class="ex-name" style="color:var(--t2)">Loading…</span></div></div></div>
+
+        </div><!-- /ex-list -->
+        <div id="client-note-section" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Right: PR + Volume -->
+      <div>
+        <div class="pr-header">
+          <div>
+            <div class="pr-h-title">PR Tracker</div>
+            <div class="pr-h-sub">All-Time Personal Records</div>
+          </div>
+          <button class="pr-log-btn" id="log-pr-btn">+ Log PR</button>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="pr-list" id="pr-list">
+            <div style="padding:20px;text-align:center;color:var(--t2);font-size:12px">Loading…</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Weekly Goal</span>
+            <span id="wg-progress" style="font-size:11px;color:var(--t2);font-weight:600">—</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+            <input id="wg-input" type="number" min="1" max="7" step="1"
+              class="form-input" readonly
+              style="width:64px;text-align:center;padding:8px;font-size:16px;font-weight:800">
+            <span style="font-size:12px;color:var(--t2)">workout days / week</span>
+            <button id="wg-save" class="btn-accent" style="display:none;margin-left:auto;padding:7px 14px;font-size:12px">Save</button>
+          </div>
+          <div id="wg-hint" style="display:none;font-size:10px;color:var(--t3);margin-top:7px"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-title">Volume Intensity</div>
+          <div class="vol-bars" id="vol-bars">
+            <div class="vbar" data-h="0%"></div>
+            <div class="vbar" data-h="0%"></div>
+            <div class="vbar" data-h="0%"></div>
+            <div class="vbar" data-h="0%"></div>
+            <div class="vbar" data-h="0%"></div>
+            <div class="vbar" data-h="0%"></div>
+            <div class="vbar" data-h="0%"></div>
+          </div>
+          <div class="vol-labels" id="vol-labels">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /train-grid -->
+  </div>
+</main>
+
+<button class="fab" title="Log workout">+</button>
+
+<!-- PR log panel -->
+<div class="form-overlay" id="pr-overlay"></div>
+<div class="form-panel" id="pr-panel">
+  <div class="form-panel-head">
+    <div class="form-panel-title">Log PR</div>
+    <button class="form-close" id="prf-close">✕</button>
+  </div>
+  <form id="pr-form" class="client-form">
+    <div class="form-group">
+      <label class="form-label">Exercise *</label>
+      <select class="form-input" id="prf-exercise" required>
+        <option value="">Select exercise…</option>
+        <option value="Deadlift">Deadlift</option>
+        <option value="Back Squat">Back Squat</option>
+        <option value="Bench Press">Bench Press</option>
+        <option value="Overhead Press">Overhead Press</option>
+        <option value="Pull-up">Pull-up</option>
+        <option value="Barbell Row">Barbell Row</option>
+        <option value="Other">Other (custom)…</option>
+      </select>
+    </div>
+    <div class="form-group" id="prf-custom-group" style="display:none">
+      <label class="form-label">Exercise Name *</label>
+      <input class="form-input" id="prf-custom" type="text" placeholder="e.g. Romanian Deadlift">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
+      <div class="form-group">
+        <label class="form-label">Weight *</label>
+        <input class="form-input" id="prf-weight" type="number" min="0" step="0.5" placeholder="e.g. 315" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unit</label>
+        <select class="form-input" id="prf-unit" style="width:80px">
+          <option value="lbs">lbs</option>
+          <option value="kg">kg</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input class="form-input" id="prf-date" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="prf-notes" type="text" placeholder="e.g. Competition lift, paused reps…">
+    </div>
+    <div id="prf-err" style="font-size:12px;color:#f87171;min-height:16px"></div>
+    <div class="form-actions">
+      <button type="button" class="btn-outline" id="prf-cancel">Cancel</button>
+      <button type="submit" class="btn-accent" id="prf-submit">Save PR</button>
+    </div>
+  </form>
+</div>
+
+<!-- Workout assignment panel -->
+<div class="form-overlay" id="workout-overlay"></div>
+<div class="form-panel" id="workout-panel">
+  <div class="form-panel-head">
+    <div class="form-panel-title" id="workout-panel-title">Assign Workout</div>
+    <button class="form-close" id="wf-close">✕</button>
+  </div>
+  <form id="workout-form" class="client-form">
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <div id="wf-date-display" style="font-size:13px;color:var(--t2);padding:4px 0">—</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Workout Title *</label>
+      <select class="form-input" id="wf-title-preset" style="margin-bottom:8px">
+        <option value="">Choose a preset…</option>
+        <option value="Push A: Chest &amp; Shoulders">Push A: Chest &amp; Shoulders</option>
+        <option value="Push B: Shoulders &amp; Triceps">Push B: Shoulders &amp; Triceps</option>
+        <option value="Pull A: Back &amp; Biceps">Pull A: Back &amp; Biceps</option>
+        <option value="Pull B: Back Width &amp; Rear Delts">Pull B: Back Width &amp; Rear Delts</option>
+        <option value="Leg Day: Quad Focus">Leg Day: Quad Focus</option>
+        <option value="Leg Day: Posterior Chain">Leg Day: Posterior Chain</option>
+        <option value="Upper Body">Upper Body</option>
+        <option value="Lower Body">Lower Body</option>
+        <option value="Full Body">Full Body</option>
+        <option value="Chest &amp; Triceps">Chest &amp; Triceps</option>
+        <option value="Back &amp; Biceps">Back &amp; Biceps</option>
+        <option value="Shoulders &amp; Arms">Shoulders &amp; Arms</option>
+        <option value="Conditioning / Cardio">Conditioning / Cardio</option>
+        <option value="Active Recovery">Active Recovery</option>
+      </select>
+      <input class="form-input" id="wf-title" type="text" placeholder="e.g. Push A: Chest &amp; Shoulders" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Exercises &amp; Details</label>
+      <select class="form-input" id="wf-exercise-preset" style="margin-bottom:8px">
+        <option value="">+ Quick-add an exercise…</option>
+        <optgroup label="Chest">
+          <option value="Barbell Bench Press">Barbell Bench Press</option>
+          <option value="Incline Dumbbell Press">Incline Dumbbell Press</option>
+          <option value="Cable Fly">Cable Fly</option>
+          <option value="Dips">Dips</option>
+        </optgroup>
+        <optgroup label="Back">
+          <option value="Deadlift">Deadlift</option>
+          <option value="Barbell Row">Barbell Row</option>
+          <option value="Pull-up">Pull-up</option>
+          <option value="Lat Pulldown">Lat Pulldown</option>
+          <option value="Seated Cable Row">Seated Cable Row</option>
+        </optgroup>
+        <optgroup label="Legs">
+          <option value="Back Squat">Back Squat</option>
+          <option value="Romanian Deadlift">Romanian Deadlift</option>
+          <option value="Leg Press">Leg Press</option>
+          <option value="Walking Lunge">Walking Lunge</option>
+          <option value="Leg Curl">Leg Curl</option>
+          <option value="Calf Raise">Calf Raise</option>
+        </optgroup>
+        <optgroup label="Shoulders &amp; Arms">
+          <option value="Overhead Press">Overhead Press</option>
+          <option value="Cable Lateral Raise">Cable Lateral Raise</option>
+          <option value="Barbell Curl">Barbell Curl</option>
+          <option value="Triceps Pushdown">Triceps Pushdown</option>
+        </optgroup>
+        <optgroup label="Core">
+          <option value="Hanging Leg Raise">Hanging Leg Raise</option>
+          <option value="Cable Crunch">Cable Crunch</option>
+          <option value="Plank">Plank</option>
+        </optgroup>
+      </select>
+      <textarea class="form-input" id="wf-exercises" rows="10"
+        placeholder="Barbell Bench Press — 4 × 6-8 @ RPE 9, rest 180s&#10;Incline Dumbbell Press — 3 × 10-12 @ RPE 8, rest 90s&#10;Cable Lateral Raise — 3 × 15+ @ RPE 10, rest 60s"
+        style="resize:vertical;line-height:1.7;min-height:180px"></textarea>
+    </div>
+    <div id="wf-err" style="font-size:12px;color:#f87171;min-height:16px"></div>
+    <div class="form-actions" style="justify-content:space-between">
+      <button type="button" class="btn-outline" id="wf-delete"
+        style="display:none;border-color:rgba(248,113,113,.4);color:#f87171">Delete</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button type="button" class="btn-outline" id="wf-cancel">Cancel</button>
+        <button type="submit" class="btn-accent" id="wf-submit">Save Workout</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+let _trainCid            = null;
+let _trainCurrentDate    = null;
+let _trainCurrentWorkout = null;
+
+/* ── PR helpers ────────────────────────────────────────── */
+function openPRForm() {
+  document.getElementById('prf-exercise').value = '';
+  document.getElementById('prf-custom').value   = '';
+  document.getElementById('prf-custom-group').style.display = 'none';
+  document.getElementById('prf-weight').value   = '';
+  document.getElementById('prf-unit').value     = 'lbs';
+  document.getElementById('prf-date').value     = getTodayIST();
+  document.getElementById('prf-notes').value    = '';
+  document.getElementById('prf-err').textContent = '';
+  document.getElementById('pr-overlay').classList.add('open');
+  document.getElementById('pr-panel').classList.add('open');
+  document.getElementById('prf-exercise').focus();
+}
+function closePRForm() {
+  document.getElementById('pr-overlay').classList.remove('open');
+  document.getElementById('pr-panel').classList.remove('open');
+}
+
+async function renderPRs() {
+  const prList = document.getElementById('pr-list');
+  if (!prList) return;
+  const prs = await loadPersonalRecords(_trainCid);
+  if (!prs.length) {
+    prList.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2);font-size:12px">No PRs logged yet — click Log PR to add one.</div>';
+    return;
+  }
+  prList.innerHTML = prs.map(({ best, previous }) => {
+    let chgClass = 'stable', chgText = 'First PR';
+    if (previous) {
+      const diff = best.weight - previous.weight;
+      if (diff > 0)      { chgClass = 'up';   chgText = `↗ +${diff}`; }
+      else if (diff < 0) { chgClass = 'down'; chgText = `↘ ${diff}`; }
+      else               { chgClass = 'stable'; chgText = 'Stable'; }
+    }
+    return `
+      <div class="pr-item">
+        <div>
+          <div class="pr-ex">${best.exercise}</div>
+          <div class="pr-wt">${best.weight} <small class="muted" style="font-size:13px">${best.unit}</small></div>
+        </div>
+        <div class="pr-chg ${chgClass}">${chgText}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Workout form helpers ───────────────────────────────── */
+function openWorkoutForm() {
+  const isClient = window._apexRole === 'client';
+  const dateLabel = new Date(_trainCurrentDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  const panelTitle = document.getElementById('workout-panel-title');
+  const dateEl     = document.getElementById('wf-date-display');
+  const titleEl    = document.getElementById('wf-title');
+  const exercisesEl= document.getElementById('wf-exercises');
+  const errEl      = document.getElementById('wf-err');
+
+  if (dateEl)     dateEl.textContent    = dateLabel;
+  if (errEl)      errEl.textContent     = '';
+  if (panelTitle) panelTitle.textContent = _trainCurrentWorkout
+    ? 'Edit Workout'
+    : (isClient ? 'Log Workout' : 'Assign Workout');
+
+  if (_trainCurrentWorkout && _trainCurrentWorkout.notes) {
+    const lines = _trainCurrentWorkout.notes.split('\n').filter(Boolean);
+    if (titleEl)     titleEl.value     = lines[0] || '';
+    if (exercisesEl) exercisesEl.value = lines.slice(1).join('\n');
+  } else {
+    if (titleEl)     titleEl.value     = '';
+    if (exercisesEl) exercisesEl.value = '';
+  }
+
+  // Reset preset pickers each time the form opens
+  const titlePreset = document.getElementById('wf-title-preset');
+  const exPreset    = document.getElementById('wf-exercise-preset');
+  if (titlePreset) titlePreset.value = '';
+  if (exPreset)    exPreset.value    = '';
+
+  // Delete only available when a workout already exists for this day
+  const delBtn = document.getElementById('wf-delete');
+  if (delBtn) delBtn.style.display = _trainCurrentWorkout ? '' : 'none';
+
+  document.getElementById('workout-overlay').classList.add('open');
+  document.getElementById('workout-panel').classList.add('open');
+  if (titleEl) titleEl.focus();
+}
+function closeWorkoutForm() {
+  document.getElementById('workout-overlay').classList.remove('open');
+  document.getElementById('workout-panel').classList.remove('open');
+}
+
+/* ── Init ───────────────────────────────────────────────── */
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+  _trainCid = getClientId();
+  if (!_trainCid) return;
+
+  const isClient = window._apexRole === 'client';
+
+  const today    = getTodayIST();                          // "YYYY-MM-DD" in IST
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // All arithmetic in pure UTC (noon) seeded from the IST date string.
+  // This avoids any local-timezone offset corrupting toISOString().
+  const [yr, mo, dy] = today.split('-').map(Number);
+  const todayUTC     = new Date(Date.UTC(yr, mo - 1, dy, 12)); // noon UTC = unambiguous date
+  const daysSinceMon = (todayUTC.getUTCDay() + 6) % 7;         // Mon=0 … Sun=6
+
+  const dayBtns = document.querySelectorAll('.day-btn');
+  dayBtns.forEach((btn, i) => {
+    const d   = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon + i, 12));
+    const iso = d.toISOString().split('T')[0];   // UTC noon → date never shifts across midnight
+    btn.dataset.date = iso;
+    btn.classList.remove('active');
+    if (iso === today) btn.classList.add('active');
+    const dname = btn.querySelector('.day-dname');
+    const dnum  = btn.querySelector('.day-dnum');
+    if (dname) dname.textContent = dayNames[d.getUTCDay()];
+    if (dnum)  dnum.textContent  = d.getUTCDate();
+  });
+
+  async function showWorkout(date) {
+    _trainCurrentDate = date;
+    const header    = document.querySelector('.ex-header-name');
+    const pgSub     = document.querySelector('.pg-sub');
+    const exList    = document.querySelector('.ex-list');
+    const estBadge  = document.getElementById('est-badge');
+    const assignBtn = document.getElementById('assign-workout-btn');
+    if (header) header.textContent = '…';
+    if (pgSub)  pgSub.textContent  = '';
+
+    const w = await loadWorkoutByDate(_trainCid, date);
+    _trainCurrentWorkout = w;
+    const dateLabel = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', weekday: 'long', month: 'short', day: 'numeric' });
+
+    if (assignBtn) {
+      assignBtn.textContent = w
+        ? 'Edit Workout'
+        : (isClient ? 'Log Workout' : 'Assign Workout');
+    }
+
+    if (w && w.notes) {
+      const lines = w.notes.split('\n').filter(Boolean);
+      if (header)   header.textContent = lines[0] || 'Workout';
+      if (pgSub)    pgSub.textContent  = `${isClient ? 'Logged' : 'Assigned'}: ${dateLabel}`;
+      if (estBadge) estBadge.style.display = '';
+      if (exList) {
+        const exLines = lines.slice(1).filter(Boolean);
+        if (!exLines.length) {
+          exList.innerHTML = `<div class="ex-card"><div class="ex-info"><div class="ex-top"><span class="ex-name">Workout saved — no exercise details added</span></div></div></div>`;
+        } else {
+          const logs = await loadExerciseLogs(_trainCid, date);
+          // pick a fitting icon for each exercise from its name
+          const exIcon = (nm) => {
+            const n = (nm || '').toLowerCase();
+            if (/run|sprint|cardio|bike|cycle|jog|treadmill|hiit|burpee/.test(n)) return 'flame';
+            if (/squat|lunge|leg|calf|deadlift|hinge|glute|hamstring|hip/.test(n)) return 'zap';
+            if (/plank|crunch|core|sit-?up|hanging|leg raise|ab\b/.test(n)) return 'target';
+            if (/stretch|mobility|yoga|warm|cool|foam/.test(n)) return 'heart';
+            return 'dumbbell';
+          };
+          exList.innerHTML = `<div class="ex-card" id="ex-rows-card" style="flex-direction:column;gap:0;padding:0;overflow:hidden">
+            ${exLines.map((line, i) => {
+              // exercise name = text before an em/en/hyphen dash
+              const m       = line.split(/\s+[—–-]\s+/);
+              const exName  = (m[0] || line).trim();
+              const detail  = m.slice(1).join(' — ').trim();
+              const logged  = logs[exName] || {};
+              const wVal    = logged.weight != null ? logged.weight : '';
+              const wUnit   = logged.unit || 'kg';
+              const isDone  = !!logged.done;
+              const exKey   = exName.replace(/"/g, '&quot;');
+              return `
+                <div class="ex-log-row" data-order="${i}" data-done="${isDone ? 1 : 0}"${isDone ? ' style="opacity:.5"' : ''}>
+                  <input type="checkbox" class="ex-done-check" ${isDone ? 'checked' : ''} title="Mark complete">
+                  <div class="ex-thumb">${icon(exIcon(exName))}</div>
+                  <div class="ex-rowinfo">
+                    <div class="ex-name-lbl"${isDone ? ' style="text-decoration:line-through;color:var(--t2)"' : ''}>${exName}</div>
+                    ${detail ? `<div class="ex-detail">${detail}</div>` : ''}
+                  </div>
+                  <div class="ex-weight-wrap">
+                    <input class="ex-weight-input form-input" type="number" min="0" step="0.5"
+                      inputmode="decimal" placeholder="—" value="${wVal}"
+                      data-exercise="${exKey}"
+                      style="width:72px;text-align:right;padding:7px 8px;font-size:13px;font-weight:700">
+                    <select class="ex-unit-select form-input" data-exercise="${exKey}"
+                      style="padding:7px 4px;font-size:11px;width:52px">
+                      <option value="kg"  ${wUnit === 'kg'  ? 'selected' : ''}>kg</option>
+                      <option value="lbs" ${wUnit === 'lbs' ? 'selected' : ''}>lbs</option>
+                    </select>
+                  </div>
+                </div>`;
+            }).join('')}
+            <div id="ex-rows-hint" style="font-size:10px;color:var(--t3);padding:8px 18px;background:rgba(255,255,255,.02);border-top:1px solid var(--border)">${isClient ? 'Tick each exercise as you finish — enter the weight you lifted.' : 'Enter the weight performed for each exercise.'} Saved automatically.</div>
+          </div>`;
+
+          const cardEl = document.getElementById('ex-rows-card');
+          const hintEl = document.getElementById('ex-rows-hint');
+
+          // Sink completed exercises to the bottom (incomplete first, original order within group)
+          const reorderRows = () => {
+            const rows = Array.from(cardEl.querySelectorAll('.ex-log-row'));
+            rows.sort((a, b) => {
+              const da = +a.dataset.done, db_ = +b.dataset.done;
+              if (da !== db_) return da - db_;
+              return (+a.dataset.order) - (+b.dataset.order);
+            });
+            rows.forEach(r => cardEl.insertBefore(r, hintEl));
+          };
+          reorderRows();
+
+          // ── Wire up auto-save (coach or client) ──
+          const saveRow = async (row, flashEl) => {
+            const wInput = row.querySelector('.ex-weight-input');
+            const uSelect= row.querySelector('.ex-unit-select');
+            const check  = row.querySelector('.ex-done-check');
+            if (!wInput) return;
+            const exercise = wInput.dataset.exercise;
+            const payload = {
+              weight: wInput.value === '' ? null : parseFloat(wInput.value),
+              unit:   uSelect ? uSelect.value : 'kg',
+              done:   check ? check.checked : false,
+            };
+            try {
+              await saveExerciseLog(_trainCid, date, exercise, payload);
+              if (flashEl) { flashEl.style.borderColor = 'var(--green)'; setTimeout(() => { flashEl.style.borderColor = ''; }, 800); }
+            } catch (_) {
+              if (flashEl) flashEl.style.borderColor = '#f87171';
+            }
+          };
+
+          cardEl.querySelectorAll('.ex-log-row').forEach(row => {
+            const wInput = row.querySelector('.ex-weight-input');
+            const uSelect= row.querySelector('.ex-unit-select');
+            const check  = row.querySelector('.ex-done-check');
+
+            [wInput, uSelect].forEach(el => el && el.addEventListener('change', () => saveRow(row, wInput)));
+
+            if (check) check.addEventListener('change', () => {
+              const done = check.checked;
+              row.dataset.done = done ? 1 : 0;
+              row.style.opacity = done ? '.5' : '';
+              const nameEl = row.querySelector('.ex-name-lbl');
+              if (nameEl) {
+                nameEl.style.textDecoration = done ? 'line-through' : '';
+                nameEl.style.color = done ? 'var(--t2)' : 'var(--t1)';
+              }
+              reorderRows();
+              saveRow(row, null);
+            });
+          });
+        }
+      }
+    } else if (w) {
+      if (header)   header.textContent = 'Workout Saved';
+      if (pgSub)    pgSub.textContent  = `${isClient ? 'Logged' : 'Assigned'}: ${dateLabel}`;
+      if (estBadge) estBadge.style.display = 'none';
+      if (exList)   exList.innerHTML   = `<div class="ex-card"><div class="ex-info"><div class="ex-top"><span class="ex-name">Workout saved — no notes added</span></div></div></div>`;
+    } else {
+      if (header)   header.textContent = 'No workout for this day';
+      if (pgSub)    pgSub.textContent  = dateLabel;
+      if (estBadge) estBadge.style.display = 'none';
+      if (exList)   exList.innerHTML   = `<div class="ex-card"><div class="ex-info"><div class="ex-top"><span class="ex-name" style="color:var(--t2)">${isClient ? 'Nothing logged yet — click Log Workout to add one' : 'Nothing assigned — click Assign Workout to add one'}</span></div></div></div>`;
+    }
+
+    /* ── Client session note ──────────────────────────────── */
+    const noteSection = document.getElementById('client-note-section');
+    if (noteSection) {
+      const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      if (w && isClient) {
+        noteSection.innerHTML = `
+          <div class="card" style="margin-top:0">
+            <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+              <span>Session Note</span>
+              <span id="note-save-status" style="font-size:10px;color:var(--t3)"></span>
+            </div>
+            <textarea id="client-note-input" class="form-input" rows="3"
+              placeholder="How did this workout feel? Any difficulty, pain, or wins to share with your coach…"
+              style="resize:vertical;margin-top:8px;line-height:1.6;width:100%">${esc(w.client_note || '')}</textarea>
+          </div>`;
+        const noteInput  = document.getElementById('client-note-input');
+        const saveStatus = document.getElementById('note-save-status');
+        let noteTimer = null;
+        noteInput.addEventListener('input', () => {
+          clearTimeout(noteTimer);
+          noteTimer = setTimeout(async () => {
+            try {
+              await saveClientNote(_trainCid, date, noteInput.value);
+              if (saveStatus) { saveStatus.textContent = 'Saved'; setTimeout(() => { if (saveStatus) saveStatus.textContent = ''; }, 1200); }
+            } catch (_) {
+              if (saveStatus) saveStatus.textContent = 'Save failed';
+            }
+          }, 900);
+        });
+      } else if (w && w.client_note && !isClient) {
+        noteSection.innerHTML = `
+          <div class="card" style="margin-top:0;border-left:3px solid var(--accent)">
+            <div class="card-title" style="font-size:11px;letter-spacing:.08em;color:var(--t2)">CLIENT NOTE</div>
+            <div id="coach-note-text" style="font-size:13px;color:var(--t1);line-height:1.65;margin-top:8px;white-space:pre-wrap"></div>
+          </div>`;
+        const noteText = document.getElementById('coach-note-text');
+        if (noteText) noteText.textContent = w.client_note;
+      } else {
+        noteSection.innerHTML = '';
+      }
+    }
+  }
+
+  /* ── Volume chart (real workout data) ────────────────────── */
+  async function renderVolumeChart() {
+    const bars   = document.querySelectorAll('#vol-bars .vbar');
+    const labels = document.querySelectorAll('#vol-labels span');
+    if (!bars.length) return;
+
+    // Build Mon–Sun date strings for this week
+    const weekDates = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon + i, 12));
+      return d.toISOString().split('T')[0];
+    });
+
+    // Fetch all workouts this week in one query
+    let weekWorkouts = [];
+    try {
+      const { data } = await db.from('workouts')
+        .select('date, notes')
+        .eq('client_id', _trainCid)
+        .gte('date', weekDates[0])
+        .lte('date', weekDates[6]);
+      weekWorkouts = data || [];
+    } catch (_) {}
+
+    // Map date → exercise line count (title excluded)
+    const volMap = {};
+    for (const w of weekWorkouts) {
+      const lines = (w.notes || '').split('\n').filter(Boolean);
+      volMap[w.date] = Math.max(1, lines.length - 1); // at least 1 if workout exists
+    }
+
+    const maxVol = Math.max(1, ...Object.values(volMap));
+
+    weekDates.forEach((date, i) => {
+      const bar   = bars[i];
+      const label = labels[i];
+      if (!bar) return;
+
+      const vol     = volMap[date] || 0;
+      const isToday = date === today;
+      const pct     = vol > 0 ? Math.max(18, Math.round(vol / maxVol * 100)) : 0;
+
+      bar.classList.remove('hi', 'today');
+      if (vol > 0)  bar.classList.add('hi');
+      if (isToday)  bar.classList.add('today');
+
+      bar.dataset.h    = pct + '%';
+      bar.style.height = pct + '%';
+      bar.style.transform = 'scaleY(0)';
+      requestAnimationFrame(() => {
+        bar.style.transition = `transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94) ${i * 55}ms`;
+        requestAnimationFrame(() => { bar.style.transform = 'scaleY(1)'; });
+      });
+
+      if (label) label.textContent = isToday ? 'Today' : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i];
+    });
+  }
+
+  /* ── Weekly workout-day goal (coach-editable) ────────────── */
+  let _workoutGoal = 5;
+  async function renderWeeklyGoal() {
+    try {
+      const { data: client } = await db.from('clients')
+        .select('workout_goal').eq('id', _trainCid).single();
+      if (client && client.workout_goal != null) _workoutGoal = Number(client.workout_goal);
+    } catch (_) {}
+
+    const weekDates = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon + i, 12));
+      return d.toISOString().split('T')[0];
+    });
+    let done = 0;
+    try {
+      const { data } = await db.from('workouts')
+        .select('date').eq('client_id', _trainCid)
+        .gte('date', weekDates[0]).lte('date', weekDates[6]);
+      done = new Set((data || []).map(w => w.date)).size;
+    } catch (_) {}
+
+    const input = document.getElementById('wg-input');
+    const prog  = document.getElementById('wg-progress');
+    if (input) input.value = _workoutGoal;
+    if (prog)  prog.textContent = `${done} / ${_workoutGoal} this week`;
+
+    // Coach (non-client) can edit the goal
+    if (!isClient) {
+      const saveBtn = document.getElementById('wg-save');
+      const hint    = document.getElementById('wg-hint');
+      if (input)   input.readOnly = false;
+      if (saveBtn) saveBtn.style.display = '';
+      if (hint)  { hint.style.display = ''; hint.textContent = 'Set how many days per week this client should train.'; }
+    }
+  }
+
+  await Promise.all([showWorkout(today), renderPRs(), renderVolumeChart(), renderWeeklyGoal()]);
+
+  // Save weekly goal (coach)
+  document.getElementById('wg-save').addEventListener('click', async () => {
+    const input = document.getElementById('wg-input');
+    let val = parseInt(input.value, 10);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 7) val = 7;
+    input.value = val;
+    const btn = document.getElementById('wg-save');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      await updateClientGoals(_trainCid, { workout_goal: val });
+      _workoutGoal = val;
+      input.style.borderColor = 'var(--green)';
+      setTimeout(() => { input.style.borderColor = ''; }, 800);
+      await renderWeeklyGoal();
+    } catch (_) {
+      input.style.borderColor = '#f87171';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save';
+    }
+  });
+
+  dayBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      dayBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showWorkout(btn.dataset.date);
+    });
+  });
+
+  /* Workout form */
+  document.getElementById('assign-workout-btn').addEventListener('click', openWorkoutForm);
+  document.getElementById('wf-close').addEventListener('click', closeWorkoutForm);
+  document.getElementById('wf-cancel').addEventListener('click', closeWorkoutForm);
+  document.getElementById('workout-overlay').addEventListener('click', closeWorkoutForm);
+
+  /* Title preset → fill the title field */
+  document.getElementById('wf-title-preset').addEventListener('change', function () {
+    if (!this.value) return;
+    const titleEl = document.getElementById('wf-title');
+    titleEl.value = this.value;
+    titleEl.focus();
+    this.value = '';   // reset so the same preset can be re-picked
+  });
+
+  /* Exercise preset → append a templated line to the details box */
+  document.getElementById('wf-exercise-preset').addEventListener('change', function () {
+    if (!this.value) return;
+    const ta   = document.getElementById('wf-exercises');
+    const line = `${this.value} — 3 × 10 @ RPE 8, rest 90s`;
+    const cur  = ta.value.trim();
+    ta.value = cur ? `${cur}\n${line}` : line;
+    ta.focus();
+    ta.scrollTop = ta.scrollHeight;
+    this.value = '';   // reset picker
+  });
+
+  document.getElementById('workout-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('wf-submit');
+    const errEl     = document.getElementById('wf-err');
+    const title     = document.getElementById('wf-title').value.trim();
+    const exercises = document.getElementById('wf-exercises').value.trim();
+
+    errEl.textContent = '';
+    if (!title) { errEl.textContent = 'Please enter a workout title.'; return; }
+
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Saving…';
+    try {
+      await saveWorkout(_trainCid, _trainCurrentDate, exercises ? `${title}\n${exercises}` : title);
+      closeWorkoutForm();
+      await Promise.all([showWorkout(_trainCurrentDate), renderVolumeChart(), renderWeeklyGoal()]);
+    } catch (err) {
+      errEl.textContent = err.message || 'Save failed. Please try again.';
+    } finally {
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Save Workout';
+    }
+  });
+
+  /* Delete workout */
+  document.getElementById('wf-delete').addEventListener('click', async () => {
+    if (!_trainCurrentWorkout) return;
+    if (!confirm('Delete this workout? This cannot be undone.')) return;
+    const delBtn = document.getElementById('wf-delete');
+    const errEl  = document.getElementById('wf-err');
+    errEl.textContent = '';
+    delBtn.disabled = true; delBtn.textContent = 'Deleting…';
+    try {
+      await deleteWorkout(_trainCurrentWorkout.id);
+      closeWorkoutForm();
+      await Promise.all([showWorkout(_trainCurrentDate), renderVolumeChart(), renderWeeklyGoal()]);
+    } catch (err) {
+      errEl.textContent = err.message || 'Delete failed. Please try again.';
+    } finally {
+      delBtn.disabled = false; delBtn.textContent = 'Delete';
+    }
+  });
+
+  /* PR form */
+  document.getElementById('log-pr-btn').addEventListener('click', openPRForm);
+  document.getElementById('prf-close').addEventListener('click', closePRForm);
+  document.getElementById('prf-cancel').addEventListener('click', closePRForm);
+  document.getElementById('pr-overlay').addEventListener('click', closePRForm);
+
+  document.getElementById('prf-exercise').addEventListener('change', function () {
+    const customGroup = document.getElementById('prf-custom-group');
+    const customInput = document.getElementById('prf-custom');
+    if (this.value === 'Other') {
+      customGroup.style.display = '';
+      customInput.required = true;
+      customInput.focus();
+    } else {
+      customGroup.style.display = 'none';
+      customInput.required = false;
+    }
+  });
+
+  document.getElementById('pr-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('prf-submit');
+    const errEl     = document.getElementById('prf-err');
+    const exSel     = document.getElementById('prf-exercise').value;
+    const exercise  = exSel === 'Other'
+      ? document.getElementById('prf-custom').value.trim()
+      : exSel;
+    const weight    = parseFloat(document.getElementById('prf-weight').value);
+    const unit      = document.getElementById('prf-unit').value;
+    const date      = document.getElementById('prf-date').value || getTodayIST();
+
+    errEl.textContent = '';
+    if (!exercise)      { errEl.textContent = 'Please select or enter an exercise.'; return; }
+    if (!weight || weight <= 0) { errEl.textContent = 'Please enter a valid weight.'; return; }
+
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Saving…';
+    try {
+      await savePersonalRecord(_trainCid, exercise, weight, unit, date);
+      closePRForm();
+      await renderPRs();
+    } catch (err) {
+      errEl.textContent = err.message || 'Save failed. Please try again.';
+    } finally {
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Save PR';
+    }
+  });
+})();
+</script>
+</body>
+</html>

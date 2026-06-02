@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($vscodePath = \"C:\\\\Users\\\\likhi\\\\AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\"; Get-ChildItem \"$vscodePath\" -Recurse -Filter \"node.exe\" -ErrorAction SilentlyContinue | Select-Object -First 3 FullName)",
+      "PowerShell(where.exe claude 2>$null; $env:PATH -split ';' | Where-Object { $_ -match 'claude|node|npm' })",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\css\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\js\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\css\\\\styles.css\")",
+      "Bash(Measure-Object -Line)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\css\\\\styles.css\" | Measure-Object -Line\\).Lines)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\" -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(Select-String -Path \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\training.html\",\"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\nutrition.html\",\"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\community.html\",\"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\admin.html\" -Pattern \"^\\\\}\\\\\\);\")",
+      "Bash(Select-Object Filename,LineNumber,Line)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\" -Recurse -File)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\" -Recurse -Filter \"*.html\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(ls -la \"C:\\\\Users\\\\likhi\\\\AppData\\\\Local\\\\Packages\\\\Microsoft.ScreenSketch_8wekyb3d8bbwe\\\\TempState\\\\Recordings\\\\20260601-1614-58.3869110.mp4\" 2>/dev/null || echo \"NOT FOUND via ls\")",
+      "Bash(ffmpeg -version)",
+      "PowerShell($ff = Get-Command ffmpeg -ErrorAction SilentlyContinue; if \\($ff\\) { $ff.Source } else { \"FFMPEG NOT FOUND\" })",
+      "Bash(Get-ChildItem -Recurse -Path \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-String -Pattern \"\\(models|schema|db\\)\")"
+    ]
+  }
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Settings</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="pg-eyebrow">Account</div>
+    <div class="pg-title">Settings</div>
+
+    <div style="max-width:680px;display:flex;flex-direction:column;gap:var(--gap)">
+
+      <!-- Preferences -->
+      <div class="card">
+        <div class="card-title">Preferences</div>
+
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-name">Weight Units</div>
+            <div class="set-desc">Display body weight and lifts in your preferred unit.</div>
+          </div>
+          <select class="set-select" id="set-units">
+            <option value="kg">Kilograms (kg)</option>
+            <option value="lbs">Pounds (lbs)</option>
+          </select>
+        </div>
+
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-name">Push Notifications</div>
+            <div class="set-desc">Get reminders for workouts and check-ins.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-notif">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-name">Coach Emails</div>
+            <div class="set-desc">Receive weekly progress summaries by email.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-emails">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-name">Reduce Motion</div>
+            <div class="set-desc">Minimise chart and page animations.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-motion">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Account -->
+      <div class="card">
+        <div class="card-title">Account</div>
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-name">Password</div>
+            <div class="set-desc">We'll email you a secure link to reset your password.</div>
+          </div>
+          <button class="btn-outline" id="set-reset">Send Reset Link</button>
+        </div>
+        <div class="set-row">
+          <div class="set-info">
+            <div class="set-name">Sign Out</div>
+            <div class="set-desc">End your session on this device.</div>
+          </div>
+          <button class="btn-outline" id="set-signout" style="border-color:var(--red);color:var(--red)">Sign Out</button>
+        </div>
+        <div id="set-msg" style="font-size:12px;min-height:16px;margin-top:10px;color:var(--green)"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<button class="fab">+</button>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+
+  const PREFS_KEY = 'apex_prefs';
+  const load = () => { try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (_) { return {}; } };
+  const save = (p) => localStorage.setItem(PREFS_KEY, JSON.stringify(p));
+  const prefs = load();
+
+  const units  = document.getElementById('set-units');
+  const notif  = document.getElementById('set-notif');
+  const emails = document.getElementById('set-emails');
+  const motion = document.getElementById('set-motion');
+
+  // Hydrate controls from saved prefs
+  units.value     = prefs.units  || 'kg';
+  notif.checked   = prefs.notif  !== false;   // default on
+  emails.checked  = prefs.emails !== false;   // default on
+  motion.checked  = !!prefs.motion;
+
+  // Persist on change
+  [units, notif, emails, motion].forEach(el => {
+    el.addEventListener('change', () => {
+      const p = load();
+      p.units  = units.value;
+      p.notif  = notif.checked;
+      p.emails = emails.checked;
+      p.motion = motion.checked;
+      save(p);
+    });
+  });
+
+  const msg = document.getElementById('set-msg');
+
+  // Password reset
+  document.getElementById('set-reset').addEventListener('click', async () => {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user || !user.email) return;
+    msg.style.color = 'var(--t2)'; msg.textContent = 'Sending…';
+    const { error } = await db.auth.resetPasswordForEmail(user.email, {
+      redirectTo: window.location.origin + '/login.html',
+    });
+    if (error) { msg.style.color = 'var(--red)'; msg.textContent = error.message; }
+    else { msg.style.color = 'var(--green)'; msg.textContent = 'Reset link sent to ' + user.email + ' ✓'; }
+  });
+
+  // Sign out
+  document.getElementById('set-signout').addEventListener('click', () => signOut());
+})();
+</script>
+</body>
+</html>

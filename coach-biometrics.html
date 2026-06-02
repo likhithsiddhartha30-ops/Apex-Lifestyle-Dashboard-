@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Biometrics</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search metrics...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <div class="bio-toprow">
+      <div>
+        <div class="pg-eyebrow">Performance Analysis</div>
+        <div class="pg-title" style="margin-bottom:0">Biometrics Overview</div>
+      </div>
+      <div class="time-sel">
+        <button class="tbtn active">1 Month</button>
+        <button class="tbtn">3 Months</button>
+        <button class="tbtn">1 Year</button>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+
+    <!-- Weight trend + metric cards -->
+    <div class="bio-grid">
+
+      <div class="wt-card">
+        <div class="wt-head">
+          <div class="wt-left-info">
+            <div class="wt-title">Weight Trend</div>
+            <div class="wt-sub">Daily Measurements</div>
+          </div>
+          <div class="wt-right-info">
+            <div class="wt-num">— <span class="wt-unit">KG</span></div>
+            <div class="wt-chg"></div>
+          </div>
+        </div>
+
+        <svg class="wt-svg" viewBox="0 0 600 120" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ff751f" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#ff751f" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="30" x2="600" y2="30" stroke="var(--border)" stroke-width="1"/>
+          <line x1="0" y1="60" x2="600" y2="60" stroke="var(--border)" stroke-width="1"/>
+          <line x1="0" y1="90" x2="600" y2="90" stroke="var(--border)" stroke-width="1"/>
+          <path d="" fill="url(#wg)" stroke="none"/>
+          <path d="" fill="url(#wg)"/>
+          <path d="" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="0" cy="0" r="0" fill="var(--accent)"/>
+          <circle cx="0" cy="0" r="0" fill="var(--accent)"/>
+          <circle cx="0" cy="0" r="0" fill="var(--accent)"/>
+          <circle cx="0" cy="0" r="0" fill="var(--accent)"/>
+        </svg>
+
+        <div class="wt-xlabels">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="bio-right">
+        <div class="metric-card">
+          <div class="metric-head">
+            <span class="metric-name">Body Fat</span>
+            <span class="metric-ico">%</span>
+          </div>
+          <div class="metric-val">— <span class="metric-unit">%</span></div>
+          <div class="bar-track" style="margin:14px 0 6px">
+            <div class="bar-fill" data-w="0%"
+              style="background:linear-gradient(90deg,var(--cyan),var(--accent));width:0"></div>
+          </div>
+          <div class="metric-scale">
+            <span>Essential</span><span>Athletic</span><span>Fit</span>
+          </div>
+          <div id="bf-log-row" style="display:none;gap:8px;margin-top:14px">
+            <input id="bf-input" type="number" min="0" max="70" step="0.1" inputmode="decimal"
+              placeholder="Log body fat %" class="form-input"
+              style="flex:1;padding:7px 10px;font-size:13px;font-weight:700">
+            <button id="bf-save" class="btn-accent" style="padding:7px 14px;font-size:12px;white-space:nowrap">Log</button>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-head">
+            <span class="metric-name">Lean Mass</span>
+            <span class="metric-ico cyan">↗</span>
+          </div>
+          <div class="metric-val">— <span class="metric-unit">KG</span></div>
+          <div class="metric-chg pos"></div>
+          <div id="lm-log-row" style="display:none;gap:8px;margin-top:14px">
+            <input id="lm-input" type="number" min="0" step="0.1" inputmode="decimal"
+              placeholder="Log lean mass (kg)" class="form-input"
+              style="flex:1;padding:7px 10px;font-size:13px;font-weight:700">
+            <button id="lm-save" class="btn-accent" style="padding:7px 14px;font-size:12px;white-space:nowrap">Log</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /bio-grid -->
+
+  </div>
+</main>
+
+<button class="fab">+</button>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  // Clear all hardcoded values immediately
+  const wtNum  = document.querySelector('.wt-num');
+  const wtChg  = document.querySelector('.wt-chg');
+  const wtSub  = document.querySelector('.wt-sub');
+  const mVals  = document.querySelectorAll('.metric-val');
+  if (wtNum) wtNum.innerHTML  = '— <span class="wt-unit">KG</span>';
+  if (wtChg) wtChg.textContent = '';
+  mVals.forEach(el => { el.innerHTML = '— <span class="metric-unit"></span>'; });
+
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+  const cid = getClientId();
+  if (!cid) return;
+
+  // ── Body-fat logging (coach or client) — saved to today's check-in ──
+  (() => {
+    const bfRow   = document.getElementById('bf-log-row');
+    const bfInput = document.getElementById('bf-input');
+    const bfSave  = document.getElementById('bf-save');
+    if (!bfRow || !bfInput || !bfSave) return;
+    bfRow.style.display = 'flex';
+
+    // Prefill today's value if already logged
+    loadCheckIns(cid, 1).then(recent => {
+      if (recent[0] && recent[0].date === getTodayIST() && recent[0].body_fat != null)
+        bfInput.value = parseFloat(recent[0].body_fat);
+    }).catch(() => {});
+
+    bfSave.addEventListener('click', async () => {
+      const val = parseFloat(bfInput.value);
+      if (isNaN(val) || val <= 0 || val > 70) { bfInput.style.borderColor = '#f87171'; return; }
+      bfSave.disabled = true; bfSave.textContent = 'Saving…';
+      try {
+        await saveCheckIn(cid, getTodayIST(), { body_fat: val });
+        const mv = document.querySelectorAll('.metric-val');
+        if (mv[0]) mv[0].innerHTML = `${val.toFixed(1)} <span class="metric-unit">%</span>`;
+        const bar = document.querySelector('.metric-card .bar-fill');
+        if (bar) bar.style.width = Math.min(val / 40 * 100, 100) + '%';
+        // recompute lean mass from latest weight — only if not manually logged
+        const recent = await loadCheckIns(cid, 1);
+        const w = recent[0] && recent[0].weight != null ? parseFloat(recent[0].weight) : null;
+        if (w != null && mv[1] && (!recent[0] || recent[0].lean_mass == null)) {
+          const lean = (w * (1 - val / 100)).toFixed(1);
+          mv[1].innerHTML = `${lean} <span class="metric-unit">KG</span>`;
+          const chg = mv[1].nextElementSibling;
+          if (chg && chg.classList.contains('metric-chg')) chg.textContent = `⊕ Lean Mass: ${lean}kg`;
+        }
+        bfInput.style.borderColor = 'var(--green)';
+        setTimeout(() => { bfInput.style.borderColor = ''; }, 900);
+        if (window.toast) window.toast('Body fat logged ✅', 'success');
+      } catch (_) {
+        bfInput.style.borderColor = '#f87171';
+        if (window.toast) window.toast('Save failed', 'error');
+      } finally {
+        bfSave.disabled = false; bfSave.textContent = 'Log';
+      }
+    });
+  })();
+
+  // ── Lean mass logging (coach or client) — measured value overrides the computed one ──
+  (() => {
+    const lmRow   = document.getElementById('lm-log-row');
+    const lmInput = document.getElementById('lm-input');
+    const lmSave  = document.getElementById('lm-save');
+    if (!lmRow || !lmInput || !lmSave) return;
+    lmRow.style.display = 'flex';
+
+    loadCheckIns(cid, 1).then(recent => {
+      if (recent[0] && recent[0].date === getTodayIST() && recent[0].lean_mass != null)
+        lmInput.value = parseFloat(recent[0].lean_mass);
+    }).catch(() => {});
+
+    lmSave.addEventListener('click', async () => {
+      const val = parseFloat(lmInput.value);
+      if (isNaN(val) || val <= 0 || val > 200) { lmInput.style.borderColor = '#f87171'; return; }
+      lmSave.disabled = true; lmSave.textContent = 'Saving…';
+      try {
+        await saveCheckIn(cid, getTodayIST(), { lean_mass: val });
+        const mv = document.querySelectorAll('.metric-val');
+        if (mv[1]) {
+          mv[1].innerHTML = `${val.toFixed(1)} <span class="metric-unit">KG</span>`;
+          const chg = mv[1].nextElementSibling;
+          if (chg && chg.classList.contains('metric-chg')) chg.textContent = `⊕ Lean Mass: ${val.toFixed(1)}kg`;
+        }
+        lmInput.style.borderColor = 'var(--green)';
+        setTimeout(() => { lmInput.style.borderColor = ''; }, 900);
+        if (window.toast) window.toast('Lean mass logged ✅', 'success');
+      } catch (_) {
+        lmInput.style.borderColor = '#f87171';
+        if (window.toast) window.toast('Save failed', 'error');
+      } finally {
+        lmSave.disabled = false; lmSave.textContent = 'Log';
+      }
+    });
+  })();
+
+  // Client goal → drives whether trends are coloured green (with goal) or red (against)
+  let _bioGoal = '';
+  try {
+    const { data: cRow } = await db.from('clients').select('goal').eq('id', cid).maybeSingle();
+    if (cRow) _bioGoal = cRow.goal || '';
+  } catch (_) {}
+  const GOOD_HEX = '#22c55e', BAD_HEX = '#ef4444';
+
+  const checkIns = await loadCheckIns(cid, 30);
+  if (!checkIns.length) {
+    if (wtNum) wtNum.innerHTML = '— <span class="wt-unit">KG</span>';
+    if (wtChg) wtChg.textContent = 'No check-ins logged yet';
+    return;
+  }
+
+  const latest = checkIns[0];
+
+  if (latest.weight != null) {
+    const wtNum = document.querySelector('.wt-num');
+    if (wtNum) wtNum.innerHTML = `${parseFloat(latest.weight).toFixed(1)} <span class="wt-unit">KG</span>`;
+  }
+
+  if (checkIns.length >= 2 && latest.weight != null && checkIns[1].weight != null) {
+    const change = parseFloat(latest.weight) - parseFloat(checkIns[1].weight);
+    const diff  = change.toFixed(1);
+    const arrow = change <= 0 ? '↘' : '↗';
+    const wtChg = document.querySelector('.wt-chg');
+    const st = window.goalStatus ? window.goalStatus(_bioGoal, 'weight', change) : (change <= 0 ? 'good' : 'bad');
+    if (wtChg) {
+      wtChg.textContent = `${arrow} ${change > 0 ? '+' : ''}${diff}kg vs previous${_bioGoal ? (st === 'bad' ? ' · off goal' : ' · on goal') : ''}`;
+      wtChg.style.color = st === 'bad' ? BAD_HEX : GOOD_HEX;
+    }
+  }
+
+  const metricVals = document.querySelectorAll('.metric-val');
+  if (latest.body_fat != null) {
+    // colour body-fat by goal alignment (trend across all logged body-fat entries)
+    const bfPts = [...checkIns].reverse().filter(c => c.body_fat != null).map(c => parseFloat(c.body_fat));
+    const bfStatus = bfPts.length >= 2 && window.goalStatus
+      ? window.goalStatus(_bioGoal, 'bodyfat', bfPts[bfPts.length - 1] - bfPts[0])
+      : 'neutral';
+    const bfColor = bfStatus === 'bad' ? BAD_HEX : (bfStatus === 'good' ? GOOD_HEX : 'var(--t1)');
+    if (metricVals[0]) {
+      metricVals[0].innerHTML = `${parseFloat(latest.body_fat).toFixed(1)} <span class="metric-unit">%</span>`;
+      metricVals[0].style.color = bfColor;
+    }
+  }
+
+  // Lean mass — prefer the measured/logged value, else compute from weight × (1 − bf%)
+  if (metricVals[1]) {
+    let lean = null;
+    if (latest.lean_mass != null) lean = parseFloat(latest.lean_mass);
+    else if (latest.weight != null && latest.body_fat != null)
+      lean = parseFloat(latest.weight) * (1 - parseFloat(latest.body_fat) / 100);
+    if (lean != null) {
+      metricVals[1].innerHTML = `${lean.toFixed(1)} <span class="metric-unit">KG</span>`;
+      const chg = metricVals[1].nextElementSibling;
+      if (chg && chg.classList.contains('metric-chg')) chg.textContent = `⊕ Lean Mass: ${lean.toFixed(1)}kg`;
+    }
+  }
+
+  const svg = document.querySelector('.wt-svg');
+  if (svg && checkIns.length >= 2) {
+    const pts     = [...checkIns].reverse();
+    const weights = pts.map(c => parseFloat(c.weight));
+    const minW    = Math.min(...weights) - 0.5;
+    const maxW    = Math.max(...weights) + 0.5;
+    const range   = maxW - minW || 1;
+    const W = 600, H = 120, padY = 12;
+
+    const coords = pts.map((_, i) => ({
+      x: parseFloat(((i / Math.max(pts.length - 1, 1)) * W).toFixed(1)),
+      y: parseFloat((H - padY - ((weights[i] - minW) / range) * (H - padY * 2)).toFixed(1))
+    }));
+
+    let d = `M ${coords[0].x},${coords[0].y}`;
+    for (let i = 1; i < coords.length; i++) {
+      const p0 = coords[i - 1], p1 = coords[i];
+      const dx = (p1.x - p0.x) / 3;
+      d += ` C ${(p0.x + dx).toFixed(1)},${p0.y} ${(p1.x - dx).toFixed(1)},${p1.y} ${p1.x},${p1.y}`;
+    }
+    const closedD = `${d} L ${W},${H} L 0,${H} Z`;
+
+    const paths = svg.querySelectorAll('path');
+    if (paths[0]) paths[0].setAttribute('d', d);
+    if (paths[1]) paths[1].setAttribute('d', closedD);
+    if (paths[2]) paths[2].setAttribute('d', d);
+
+    // Colour the whole trend by goal alignment (green with goal, red against)
+    const overall = weights[weights.length - 1] - weights[0];
+    const wStatus = window.goalStatus ? window.goalStatus(_bioGoal, 'weight', overall) : (overall <= 0 ? 'good' : 'bad');
+    const trendHex = wStatus === 'bad' ? BAD_HEX : GOOD_HEX;
+    if (paths[2]) paths[2].setAttribute('stroke', trendHex);
+    svg.querySelectorAll('circle').forEach(c => c.setAttribute('fill', trendHex));
+    const grad = svg.querySelector('#wg');
+    if (grad) grad.querySelectorAll('stop').forEach(s => s.setAttribute('stop-color', trendHex));
+
+    const n       = coords.length;
+    const keyIdxs = [Math.floor(n * 0.25), Math.floor(n * 0.5), Math.floor(n * 0.75), n - 1];
+    svg.querySelectorAll('circle').forEach((c, i) => {
+      const idx = keyIdxs[i];
+      if (coords[idx]) { c.setAttribute('cx', coords[idx].x); c.setAttribute('cy', coords[idx].y); }
+    });
+
+    const labels    = document.querySelectorAll('.wt-xlabels span');
+    const lblIdxs   = [0, Math.floor(n * 0.25), Math.floor(n * 0.5), Math.floor(n * 0.75), n - 1];
+    labels.forEach((lbl, i) => {
+      const pt = pts[lblIdxs[i]];
+      if (pt) lbl.textContent = new Date(pt.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+  }
+})();
+</script>
+</body>
+</html>

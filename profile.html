@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Profile</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="pg-eyebrow">Account</div>
+    <div class="pg-title">Profile</div>
+
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--gap);max-width:900px">
+
+      <!-- Edit card -->
+      <div class="card">
+        <div class="card-title">Account Details</div>
+
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px">
+          <div id="prof-avatar" class="pd-avatar-lg" title="Change photo"
+            style="width:64px;height:64px;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
+            <span data-icon="user" style="display:flex"></span>
+          </div>
+          <div style="min-width:0">
+            <div id="prof-name" style="font-family:'Lato';font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px">—</div>
+            <div id="prof-email" style="font-size:12px;color:var(--t2);margin-top:3px">—</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+              <span class="badge-green" id="prof-role-badge"><span class="pulse"></span><span id="prof-role">—</span></span>
+              <button type="button" id="prof-photo-btn" class="btn-outline" style="padding:5px 12px;font-size:11px">Change Photo</button>
+            </div>
+          </div>
+          <input type="file" id="prof-photo-input" accept="image/*" style="display:none">
+        </div>
+
+        <form id="profile-form" class="client-form" style="gap:18px">
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input class="form-input" id="pf-name" type="text" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="pf-email" type="email" disabled style="opacity:0.6;cursor:not-allowed">
+          </div>
+          <div id="pf-msg" style="font-size:12px;min-height:16px;color:var(--green)"></div>
+          <div>
+            <button class="btn-accent" id="pf-save" type="submit">Save Changes</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Info card -->
+      <div class="card" style="align-self:start">
+        <div class="card-title">Overview</div>
+        <div class="prog-stats" style="border-top:none;padding-top:0">
+          <div class="prog-row"><span class="lbl">Role</span><span class="val val-sm" id="pf-role-val">—</span></div>
+          <div class="prog-row"><span class="lbl">Member Since</span><span class="val val-sm" id="pf-since">—</span></div>
+          <div class="prog-row" id="pf-goal-row" style="display:none"><span class="lbl">Goal</span><span class="val val-sm accent" id="pf-goal">—</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<button class="fab">+</button>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const m    = user.user_metadata || {};
+  const name = m.full_name || m.display_name || m.name
+             || (user.email ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) : 'User');
+  const role = window._apexRole === 'admin' ? 'Admin'
+             : window._apexRole === 'coach' ? 'Coach' : 'Client';
+
+  document.getElementById('prof-name').textContent  = name;
+  document.getElementById('prof-email').textContent = user.email || '';
+  document.getElementById('prof-role').textContent  = role;
+
+  // Show existing photo + wire upload
+  if (m.avatar_url) window.applyAvatar(m.avatar_url);
+  const photoInput = document.getElementById('prof-photo-input');
+  const openPicker = () => photoInput.click();
+  document.getElementById('prof-photo-btn').addEventListener('click', openPicker);
+  document.getElementById('prof-avatar').addEventListener('click', openPicker);
+  photoInput.addEventListener('change', async () => {
+    const file = photoInput.files && photoInput.files[0];
+    if (!file) return;
+    try {
+      const r = await window.uploadAvatar(file);
+      if (r && window.toast) window.toast('Profile photo updated 📸', 'success');
+    } catch (err) {
+      if (window.toast) window.toast(err.message || 'Upload failed', 'error');
+    }
+    photoInput.value = '';
+  });
+  document.getElementById('pf-name').value          = name;
+  document.getElementById('pf-email').value         = user.email || '';
+  document.getElementById('pf-role-val').textContent = role;
+
+  // Member since — auth account creation date
+  if (user.created_at) {
+    document.getElementById('pf-since').textContent =
+      new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  }
+
+  // Client-specific: goal + start date from clients table
+  if (window._apexRole === 'client') {
+    try {
+      const { data: c } = await db.from('clients').select('goal,start_date').eq('email', user.email).maybeSingle();
+      if (c) {
+        if (c.goal) {
+          document.getElementById('pf-goal').textContent = c.goal;
+          document.getElementById('pf-goal-row').style.display = 'flex';
+        }
+        if (c.start_date) {
+          document.getElementById('pf-since').textContent =
+            new Date(c.start_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Save display name → auth user_metadata
+  document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn   = document.getElementById('pf-save');
+    const msg   = document.getElementById('pf-msg');
+    const newNm = document.getElementById('pf-name').value.trim();
+    if (!newNm) { msg.style.color = 'var(--red)'; msg.textContent = 'Name cannot be empty.'; return; }
+
+    btn.disabled = true; btn.textContent = 'Saving…'; msg.textContent = '';
+    const { error } = await db.auth.updateUser({ data: { full_name: newNm } });
+    btn.disabled = false; btn.textContent = 'Save Changes';
+
+    if (error) {
+      msg.style.color = 'var(--red)'; msg.textContent = error.message;
+    } else {
+      msg.style.color = 'var(--green)'; msg.textContent = 'Profile updated ✓';
+      // Keep sidebar + dropdown in sync
+      document.getElementById('prof-name').textContent = newNm;
+      const sbName = document.getElementById('sb-admin-name');
+      if (sbName) sbName.textContent = newNm;
+      const pdName = document.getElementById('pd-name');
+      if (pdName) pdName.textContent = newNm;
+      try {
+        const cached = JSON.parse(sessionStorage.getItem('apex_sidebar') || '{}');
+        cached.name = newNm;
+        sessionStorage.setItem('apex_sidebar', JSON.stringify(cached));
+      } catch (_) {}
+    }
+  });
+})();
+</script>
+</body>
+</html>

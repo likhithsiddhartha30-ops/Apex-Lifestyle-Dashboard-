@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Admin</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+.admin-header-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; margin-top:var(--gap); }
+.admin-section + .admin-section { margin-top: calc(var(--gap) * 1.5); }
+
+/* Reset Password modal */
+.rp-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; backdrop-filter:blur(2px); }
+.rp-overlay.open { display:block; }
+.rp-modal {
+  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:28px; width:380px; max-width:calc(100vw - 40px);
+  z-index:201; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+.rp-modal.open { display:block; }
+.rp-head  { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.rp-title { font-size:15px; font-weight:700; color:var(--t1); }
+.rp-for   { font-size:12px; color:var(--t2); margin-bottom:18px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <div class="admin-header">
+      <div>
+        <div class="pg-eyebrow">Admin Panel</div>
+        <div class="pg-title" style="margin-bottom:0">Management</div>
+      </div>
+    </div>
+
+    <div class="admin-stats">
+      <div class="astat-card">
+        <div class="astat-num" id="stat-clients">—</div>
+        <div class="astat-lbl">Total Clients</div>
+      </div>
+      <div class="astat-card">
+        <div class="astat-num" id="stat-coaches">—</div>
+        <div class="astat-lbl">Total Coaches</div>
+      </div>
+      <div class="astat-card">
+        <div class="astat-num" id="stat-new-month">—</div>
+        <div class="astat-lbl">New This Month</div>
+      </div>
+    </div>
+
+    <!-- DB setup banner -->
+    <div id="db-setup-banner" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:var(--gap);display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:3px">Database Setup</div>
+        <div style="font-size:11px;color:var(--t2)">Create all required tables (clients, coaches, workouts, meals, personal_records, …). Safe to run multiple times.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <span id="db-setup-status" style="font-size:11px;color:var(--t2)"></span>
+        <button class="btn-accent" id="btn-setup-db" style="white-space:nowrap">Setup Database</button>
+      </div>
+    </div>
+
+    <!-- Clients section -->
+    <div class="admin-section" id="tab-clients">
+      <div class="admin-header-row">
+        <div class="card-title" style="margin:0">Clients</div>
+        <button class="btn-accent" id="btn-add-client">+ Add Client</button>
+      </div>
+      <div class="admin-table-wrap">
+        <div class="admin-table-head">
+          <span>Client</span>
+          <span>Email</span>
+          <span>Goal</span>
+          <span>Started</span>
+          <span>Actions</span>
+        </div>
+        <div id="clients-list">
+          <div class="admin-empty">Loading clients…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coaches section -->
+    <div class="admin-section" id="tab-coaches">
+      <div class="admin-header-row">
+        <div class="card-title" style="margin:0">Coaches</div>
+        <button class="btn-accent" id="btn-add-coach">+ Add Coach</button>
+      </div>
+      <div class="admin-table-wrap">
+        <div class="admin-table-head">
+          <span>Coach</span>
+          <span>Email</span>
+          <span>Specialty</span>
+          <span>Joined</span>
+          <span>Actions</span>
+        </div>
+        <div id="coaches-list">
+          <div class="admin-empty">Loading coaches…</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Slide-in form panel -->
+<div class="form-overlay" id="form-overlay"></div>
+<div class="form-panel" id="form-panel">
+  <div class="form-panel-head">
+    <div class="form-panel-title" id="form-title">Add Client</div>
+    <button class="form-close" id="form-close-btn">✕</button>
+  </div>
+  <form id="entity-form" class="client-form">
+    <div class="form-group">
+      <label class="form-label">Full Name *</label>
+      <input class="form-input" id="f-name" type="text" placeholder="Full name" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email *</label>
+      <input class="form-input" id="f-email" type="email" placeholder="email@example.com" required>
+    </div>
+    <!-- Password — only shown when adding a new client -->
+    <div class="form-group" id="f-pass-group" style="display:none">
+      <label class="form-label">Temporary Password *</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="form-input" id="f-pass" type="text" placeholder="Min 8 characters" style="flex:1">
+        <button type="button" id="btn-gen-pass" class="btn-outline" style="white-space:nowrap;padding:10px 14px;flex-shrink:0">Generate</button>
+      </div>
+      <div style="font-size:11px;color:var(--t2);margin-top:5px">Share these credentials with the client so they can log in.</div>
+    </div>
+    <div class="form-group" id="f-goal-group">
+      <label class="form-label" id="f-goal-label">Goal</label>
+      <input class="form-input" id="f-goal" type="text" placeholder="Build lean muscle, lose fat…">
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="f-date-label">Start Date</label>
+      <input class="form-input" id="f-start" type="date">
+    </div>
+    <div class="form-group" id="f-macros-group" style="display:none">
+      <label class="form-label">Macro Targets <span style="color:var(--t2);font-weight:400">(daily)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+        <div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:4px">Calories (kcal)</div>
+          <input class="form-input" id="f-cal-goal" type="number" min="0" placeholder="2500">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:4px">Protein (g)</div>
+          <input class="form-input" id="f-protein-goal" type="number" min="0" placeholder="220">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:4px">Carbs (g)</div>
+          <input class="form-input" id="f-carbs-goal" type="number" min="0" placeholder="250">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:4px">Fats (g)</div>
+          <input class="form-input" id="f-fat-goal" type="number" min="0" placeholder="75">
+        </div>
+      </div>
+    </div>
+    <div id="form-err" class="login-err"></div>
+    <div class="form-actions">
+      <button class="btn-outline" type="button" id="form-cancel-btn">Cancel</button>
+      <button class="btn-accent"  type="submit" id="form-submit-btn">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="rp-overlay" id="rp-overlay"></div>
+<div class="rp-modal" id="rp-modal">
+  <div class="rp-head">
+    <div class="rp-title">Reset Password</div>
+    <button class="form-close" id="rp-close">✕</button>
+  </div>
+  <div class="rp-for">Changing password for <strong id="rp-name"></strong></div>
+  <div class="form-group">
+    <label class="form-label">New Password</label>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input class="form-input" id="rp-pass" type="text" placeholder="Min 8 characters" style="flex:1">
+      <button type="button" id="rp-gen" class="btn-outline" style="white-space:nowrap;padding:10px 14px;flex-shrink:0">Generate</button>
+    </div>
+  </div>
+  <div id="rp-err" class="login-err" style="min-height:14px;margin-top:4px"></div>
+  <div class="form-actions" style="margin-top:8px">
+    <button class="btn-outline" id="rp-cancel">Cancel</button>
+    <button class="btn-accent"  id="rp-confirm">Reset Password</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+const clientsMap = new Map();
+const coachesMap  = new Map();
+let editingId     = null;
+let activeMode    = 'client'; // 'client' | 'coach'
+
+/* ── Form open/close ───────────────────────────────────── */
+function openForm(mode, entity = null) {
+  activeMode = mode;
+  editingId  = entity ? String(entity.id) : null;
+
+  const isCoach   = mode === 'coach';
+  const isNewClient = !isCoach && !entity;
+
+  document.getElementById('form-title').textContent      = entity ? `Edit ${isCoach ? 'Coach' : 'Client'}` : `Add ${isCoach ? 'Coach' : 'Client'}`;
+  document.getElementById('form-submit-btn').textContent = entity ? 'Update' : 'Save';
+  document.getElementById('f-goal-label').textContent    = isCoach ? 'Specialty' : 'Goal';
+  document.getElementById('f-date-label').textContent    = isCoach ? 'Joined Date' : 'Start Date';
+  document.getElementById('f-name').placeholder          = isCoach ? 'Coach name' : 'Client name';
+  document.getElementById('f-goal').placeholder          = isCoach ? 'Strength & Conditioning, Nutrition…' : 'Build lean muscle, lose fat…';
+
+  document.getElementById('f-name').value  = entity?.name        || '';
+  document.getElementById('f-email').value = entity?.email       || '';
+  document.getElementById('f-goal').value  = isCoach ? (entity?.specialty || '') : (entity?.goal || '');
+  document.getElementById('f-start').value = isCoach ? (entity?.joined_date || '') : (entity?.start_date || '');
+  document.getElementById('f-pass').value  = '';
+  document.getElementById('form-err').textContent = '';
+
+  // Password field for any new user (client or coach), not for edits
+  const isNew = !entity;
+  document.getElementById('f-pass-group').style.display = isNew ? '' : 'none';
+  document.getElementById('f-pass').required = isNew;
+
+  // Macro targets — clients only
+  document.getElementById('f-macros-group').style.display = isCoach ? 'none' : '';
+  if (!isCoach) {
+    document.getElementById('f-cal-goal').value     = entity?.cal_goal     ?? '';
+    document.getElementById('f-protein-goal').value = entity?.protein_goal ?? '';
+    document.getElementById('f-carbs-goal').value   = entity?.carbs_goal   ?? '';
+    document.getElementById('f-fat-goal').value     = entity?.fat_goal     ?? '';
+  }
+
+  document.getElementById('form-overlay').classList.add('open');
+  document.getElementById('form-panel').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+
+/* ── Generate password ─────────────────────────────────── */
+function generatePassword() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+  return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+document.getElementById('btn-gen-pass').addEventListener('click', () => {
+  document.getElementById('f-pass').value = generatePassword();
+});
+
+function closeForm() {
+  document.getElementById('form-overlay').classList.remove('open');
+  document.getElementById('form-panel').classList.remove('open');
+  editingId = null;
+}
+
+/* ── Render clients ────────────────────────────────────── */
+async function renderClients() {
+  const list = document.getElementById('clients-list');
+  list.innerHTML = '<div class="admin-empty">Loading…</div>';
+
+  const clients = await loadClients();
+  clientsMap.clear();
+  clients.forEach(c => clientsMap.set(String(c.id), c));
+  document.getElementById('stat-clients').textContent = clients.length;
+
+  const thisMonth = new Date().toISOString().slice(0, 7);
+  const newClients = clients.filter(c => c.start_date && c.start_date.startsWith(thisMonth)).length;
+
+  updateNewThisMonth(newClients);
+
+  if (!clients.length) {
+    list.innerHTML = '<div class="admin-empty">No clients yet — click <strong>+ Add Client</strong> to get started.</div>';
+    return;
+  }
+
+  list.innerHTML = clients.map(c => `
+    <div class="admin-row">
+      <div class="admin-cell">
+        <div class="admin-av">${c.name.charAt(0).toUpperCase()}</div>
+        <div class="admin-name">${c.name}</div>
+      </div>
+      <div class="admin-cell admin-email">${c.email || '—'}</div>
+      <div class="admin-cell admin-goal">${c.goal || '—'}</div>
+      <div class="admin-cell admin-date">${c.start_date ? new Date(c.start_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</div>
+      <div class="admin-cell admin-acts">
+        <button class="admin-btn edit"   data-id="${c.id}" data-mode="client">${icon('edit')} Edit</button>
+        <button class="admin-btn reset"  data-id="${c.id}" data-mode="client">${icon('key')} Reset PW</button>
+        <button class="admin-btn delete" data-id="${c.id}" data-mode="client">${icon('trash')} Delete</button>
+      </div>
+    </div>`).join('');
+
+  list.querySelectorAll('.admin-btn.edit').forEach(btn =>
+    btn.addEventListener('click', () => openForm('client', clientsMap.get(btn.dataset.id))));
+  list.querySelectorAll('.admin-btn.reset').forEach(btn => {
+    const entity = clientsMap.get(btn.dataset.id);
+    btn.addEventListener('click', () => openResetPassword(entity.name, entity.email));
+  });
+  list.querySelectorAll('.admin-btn.delete').forEach(btn =>
+    btn.addEventListener('click', () => deleteEntity('client', btn.dataset.id)));
+}
+
+/* ── Render coaches ────────────────────────────────────── */
+async function renderCoaches() {
+  const list = document.getElementById('coaches-list');
+  list.innerHTML = '<div class="admin-empty">Loading…</div>';
+
+  const coaches = await loadCoaches();
+  coachesMap.clear();
+  coaches.forEach(c => coachesMap.set(String(c.id), c));
+  document.getElementById('stat-coaches').textContent = coaches.length;
+
+  const thisMonth = new Date().toISOString().slice(0, 7);
+  const newCoaches = coaches.filter(c => c.joined_date && c.joined_date.startsWith(thisMonth)).length;
+  updateNewThisMonth(newCoaches);
+
+  if (!coaches.length) {
+    list.innerHTML = '<div class="admin-empty">No coaches yet — click <strong>+ Add Coach</strong> to get started.</div>';
+    return;
+  }
+
+  list.innerHTML = coaches.map(c => `
+    <div class="admin-row">
+      <div class="admin-cell">
+        <div class="admin-av" style="background:var(--cyan);color:#000">${c.name.charAt(0).toUpperCase()}</div>
+        <div class="admin-name">${c.name}</div>
+      </div>
+      <div class="admin-cell admin-email">${c.email || '—'}</div>
+      <div class="admin-cell admin-goal">${c.specialty || '—'}</div>
+      <div class="admin-cell admin-date">${c.joined_date ? new Date(c.joined_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</div>
+      <div class="admin-cell admin-acts">
+        <button class="admin-btn edit"   data-id="${c.id}" data-mode="coach">${icon('edit')} Edit</button>
+        <button class="admin-btn reset"  data-id="${c.id}" data-mode="coach">${icon('key')} Reset PW</button>
+        <button class="admin-btn delete" data-id="${c.id}" data-mode="coach">${icon('trash')} Delete</button>
+      </div>
+    </div>`).join('');
+
+  list.querySelectorAll('.admin-btn.edit').forEach(btn =>
+    btn.addEventListener('click', () => openForm('coach', coachesMap.get(btn.dataset.id))));
+  list.querySelectorAll('.admin-btn.reset').forEach(btn => {
+    const entity = coachesMap.get(btn.dataset.id);
+    btn.addEventListener('click', () => openResetPassword(entity.name, entity.email));
+  });
+  list.querySelectorAll('.admin-btn.delete').forEach(btn =>
+    btn.addEventListener('click', () => deleteEntity('coach', btn.dataset.id)));
+}
+
+/* ── New this month (combined) ─────────────────────────── */
+let _newClients = 0, _newCoaches = 0;
+function updateNewThisMonth(val) {
+  // called once for clients, once for coaches — sum both
+  _newClients = document.getElementById('stat-clients').textContent !== '—'
+    ? parseInt(document.getElementById('stat-clients').textContent) || 0 : 0;
+  document.getElementById('stat-new-month').textContent = val;
+}
+
+/* ── Delete ────────────────────────────────────────────── */
+async function deleteEntity(mode, id) {
+  const isCoach = mode === 'coach';
+  const map     = isCoach ? coachesMap : clientsMap;
+  const table   = isCoach ? 'coaches'  : 'clients';
+  const entity  = map.get(id);
+  const label   = isCoach ? 'coach' : 'client';
+  if (!confirm(`Delete "${entity?.name || 'this ' + label}"?`)) return;
+  const { error } = await db.from(table).delete().eq('id', id);
+  if (error) { alert('Delete failed: ' + error.message); return; }
+  isCoach ? await renderCoaches() : await renderClients();
+}
+
+/* ── Form submit ───────────────────────────────────────── */
+document.getElementById('entity-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById('form-submit-btn');
+  const errEl     = document.getElementById('form-err');
+  submitBtn.disabled    = true;
+  submitBtn.textContent = 'Saving…';
+  errEl.textContent     = '';
+
+  const isCoach = activeMode === 'coach';
+  const isNew   = !editingId;
+  const table   = isCoach ? 'coaches' : 'clients';
+
+  const name     = document.getElementById('f-name').value.trim();
+  const email    = document.getElementById('f-email').value.trim();
+  const goalVal  = document.getElementById('f-goal').value.trim() || null;
+  const dateVal  = document.getElementById('f-start').value || null;
+
+  // ── New client or new coach → Edge Function creates auth user + DB row ──
+  if (isNew) {
+    const password = document.getElementById('f-pass').value.trim();
+    if (!password) {
+      errEl.textContent = 'Please enter or generate a temporary password.';
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Save';
+      return;
+    }
+
+    const body = isCoach
+      ? { type: 'coach', name, email, password, specialty: goalVal, joined_date: dateVal }
+      : { type: 'client', name, email, password, goal: goalVal, start_date: dateVal };
+
+    const { data, error: fnErr } = await db.functions.invoke('create-client', { body });
+
+    submitBtn.disabled    = false;
+    submitBtn.textContent = 'Save';
+
+    if (fnErr) {
+      let msg = fnErr.message;
+      try { const b = await fnErr.context.json(); msg = b.error || msg; } catch (_) {}
+      errEl.textContent = msg;
+      return;
+    }
+    if (data?.error) {
+      errEl.textContent = data.error;
+      return;
+    }
+
+    const label = isCoach ? 'Coach' : 'Client';
+    closeForm();
+    isCoach ? await renderCoaches() : await renderClients();
+
+    setTimeout(() => {
+      alert(`${label} created!\n\nLogin credentials to share:\nEmail: ${email}\nPassword: ${password}\n\nThey can log in at your app URL.`);
+    }, 200);
+    return;
+  }
+
+  // ── Edit existing — just update the DB row, no auth change ──
+  const payload = isCoach
+    ? { name, email, specialty: goalVal, joined_date: dateVal }
+    : {
+        name, email, goal: goalVal, start_date: dateVal,
+        cal_goal:     parseFloat(document.getElementById('f-cal-goal').value)     || null,
+        protein_goal: parseFloat(document.getElementById('f-protein-goal').value) || null,
+        carbs_goal:   parseFloat(document.getElementById('f-carbs-goal').value)   || null,
+        fat_goal:     parseFloat(document.getElementById('f-fat-goal').value)     || null,
+      };
+
+  const { error } = await db.from(table).update(payload).eq('id', editingId);
+
+  submitBtn.disabled    = false;
+  submitBtn.textContent = 'Save';
+
+  if (error) { errEl.textContent = error.message; return; }
+  closeForm();
+  isCoach ? await renderCoaches() : await renderClients();
+});
+
+/* ── DB connection check ───────────────────────────────── */
+async function checkDbConnection() {
+  const banner   = document.getElementById('db-setup-banner');
+  const statusEl = document.getElementById('db-setup-status');
+
+  try {
+    const { error } = await db.from('meals').select('id').limit(1);
+    if (error && error.code === '42P01') {
+      // Table does not exist — show setup banner
+      if (banner) banner.style.display = 'flex';
+    } else {
+      // Connection fine, tables exist
+      if (statusEl) statusEl.textContent = '✓ All tables connected';
+      if (banner)   banner.style.display = 'flex';
+    }
+  } catch (_) {
+    if (banner) banner.style.display = 'flex';
+  }
+}
+
+/* ── Reset Password Modal ──────────────────────────────── */
+let rpEmail = '';
+
+function openResetPassword(name, email) {
+  rpEmail = email;
+  document.getElementById('rp-name').textContent = name;
+  document.getElementById('rp-pass').value        = '';
+  document.getElementById('rp-err').textContent   = '';
+  document.getElementById('rp-overlay').classList.add('open');
+  document.getElementById('rp-modal').classList.add('open');
+  setTimeout(() => document.getElementById('rp-pass').focus(), 50);
+}
+
+function closeResetPassword() {
+  document.getElementById('rp-overlay').classList.remove('open');
+  document.getElementById('rp-modal').classList.remove('open');
+  rpEmail = '';
+}
+
+document.getElementById('rp-close').addEventListener('click',   closeResetPassword);
+document.getElementById('rp-cancel').addEventListener('click',  closeResetPassword);
+document.getElementById('rp-overlay').addEventListener('click', closeResetPassword);
+
+document.getElementById('rp-gen').addEventListener('click', () => {
+  document.getElementById('rp-pass').value = generatePassword();
+});
+
+document.getElementById('rp-confirm').addEventListener('click', async () => {
+  const password = document.getElementById('rp-pass').value.trim();
+  const errEl    = document.getElementById('rp-err');
+  const btn      = document.getElementById('rp-confirm');
+
+  if (!password || password.length < 8) {
+    errEl.textContent = 'Password must be at least 8 characters.';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Resetting…';
+  errEl.textContent = '';
+
+  const { data, error: fnErr } = await db.functions.invoke('create-client', {
+    body: { type: 'reset-password', email: rpEmail, password }
+  });
+
+  btn.disabled    = false;
+  btn.textContent = 'Reset Password';
+
+  if (fnErr) {
+    let msg = fnErr.message;
+    try { const b = await fnErr.context.json(); msg = b.error || msg; } catch (_) {}
+    errEl.textContent = msg;
+    return;
+  }
+  if (data?.error) { errEl.textContent = data.error; return; }
+
+  const savedEmail = rpEmail;
+  const savedPass  = password;
+  closeResetPassword();
+  setTimeout(() => alert(`Password reset!\n\nCredentials to share:\nEmail: ${savedEmail}\nPassword: ${savedPass}`), 100);
+});
+
+/* ── Init ──────────────────────────────────────────────── */
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+
+  await initSidebar();
+  await Promise.all([renderClients(), renderCoaches(), checkDbConnection()]);
+
+  document.getElementById('btn-add-client').addEventListener('click', () => openForm('client'));
+  document.getElementById('btn-add-coach').addEventListener('click',  () => openForm('coach'));
+  document.getElementById('form-close-btn').addEventListener('click',  closeForm);
+  document.getElementById('form-cancel-btn').addEventListener('click', closeForm);
+  document.getElementById('form-overlay').addEventListener('click',    closeForm);
+
+  document.getElementById('btn-setup-db').addEventListener('click', async () => {
+    const btn      = document.getElementById('btn-setup-db');
+    const statusEl = document.getElementById('db-setup-status');
+    btn.disabled    = true;
+    btn.textContent = 'Setting up…';
+    statusEl.textContent = '';
+
+    try {
+      const result = await setupDatabase();
+      const ok  = result?.tables?.filter(t => t.status === 'ok').length  ?? 0;
+      const err = result?.tables?.filter(t => t.status !== 'ok').length  ?? 0;
+      statusEl.style.color = err ? 'var(--red)' : 'var(--green)';
+      statusEl.textContent = err
+        ? `${ok} ok · ${err} failed — check console`
+        : `✓ ${ok} tables ready`;
+      if (err) console.error('Setup errors:', result.tables.filter(t => t.status !== 'ok'));
+    } catch (e) {
+      statusEl.style.color   = 'var(--red)';
+      statusEl.textContent   = e.message || 'Setup failed — check console';
+      console.error('setupDatabase error:', e);
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Setup Database';
+    }
+  });
+})();
+</script>
+</body>
+</html>

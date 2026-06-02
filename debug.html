@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Debug</title>
+<style>
+  body { background:#141414; color:#fff; font-family:monospace; padding:30px; line-height:1.6; }
+  pre  { background:#202020; border:1px solid #333; border-radius:8px; padding:16px; white-space:pre-wrap; word-break:break-all; }
+  h3   { color:#ff751f; margin-top:24px; }
+  .ok  { color:#22c55e; } .bad { color:#ef4444; }
+</style>
+</head>
+<body>
+<h3>1. Which initSidebar version is loaded?</h3>
+<pre id="ver">…</pre>
+
+<h3>2. getUser() result</h3>
+<pre id="user">…</pre>
+
+<h3>3. Live test: run initSidebar on mock sidebar elements</h3>
+<pre id="test">…</pre>
+
+<!-- Hidden mock sidebar that initSidebar will target -->
+<div style="display:none">
+  <div id="sb-admin-name">—</div>
+  <div id="sb-admin-role">—</div>
+  <select id="client-select"></select>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script>
+(async () => {
+  // 1. Show which initSidebar is loaded
+  const src = (typeof initSidebar !== 'undefined') ? initSidebar.toString() : 'NOT DEFINED';
+  const isNew = src.includes('getUser') && src.includes('sb-admin-name');
+  document.getElementById('ver').innerHTML =
+    (isNew ? '<span class="ok">NEW version loaded (good)</span>' : '<span class="bad">OLD version loaded — browser cache!</span>')
+    + '\n\n' + src.slice(0, 260);
+
+  // 2. getUser
+  try {
+    const { data: { user }, error } = await db.auth.getUser();
+    document.getElementById('user').textContent = error
+      ? 'ERROR: ' + error.message
+      : 'display_name = ' + JSON.stringify(user?.user_metadata?.display_name);
+  } catch (e) {
+    document.getElementById('user').textContent = 'THREW: ' + e.message;
+  }
+
+  // 3. Run the real initSidebar against mock elements
+  try {
+    await initSidebar();
+    const nameVal = document.getElementById('sb-admin-name').textContent;
+    document.getElementById('test').innerHTML =
+      'sb-admin-name is now: <span class="' + (nameVal === 'Likhith' ? 'ok' : 'bad') + '">"' + nameVal + '"</span>';
+  } catch (e) {
+    document.getElementById('test').innerHTML = '<span class="bad">initSidebar THREW: ' + e.message + '</span>';
+  }
+})();
+</script>
+</body>
+</html>

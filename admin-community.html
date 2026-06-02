@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexLifestyle — Community</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+    <a class="nav-item" href="admin.html"      data-page="admin.html"><span class="nav-icon">⚙</span>Admin</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-brand">ApexLifestyle</span>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search members...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="pg-eyebrow">Social Hub</div>
+    <div class="pg-title">Community</div>
+
+    <!-- Top athletes (by sessions logged) -->
+    <div class="comm-grid" id="top-athletes">
+      <div style="color:var(--t2);font-size:13px;padding:8px">Loading…</div>
+    </div>
+
+    <!-- Feed + leaderboard -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:var(--gap)">
+
+      <div>
+        <div class="card-title" style="margin-bottom:14px">Activity Feed</div>
+
+        <!-- Composer -->
+        <div class="comm-post">
+          <textarea id="post-input" rows="3" placeholder="Share an update with the community…"
+            class="form-input" style="resize:vertical;width:100%;line-height:1.6"></textarea>
+          <div id="post-media-preview" style="display:none;position:relative;margin-top:10px"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <button id="post-attach" class="btn-outline" style="padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:7px">
+              <span data-icon="share"></span> Photo / Video
+            </button>
+            <button id="post-btn" class="btn-accent" style="padding:8px 20px;font-size:13px">Post</button>
+          </div>
+          <input type="file" id="post-file" accept="image/*,video/*" style="display:none">
+        </div>
+
+        <div id="feed-list">
+          <div style="padding:24px;text-align:center;color:var(--t2);font-size:13px">Loading feed…</div>
+        </div>
+      </div>
+
+      <!-- Leaderboard + Members -->
+      <div>
+        <div class="leaderboard">
+          <div class="card-title">Leaderboard <span style="font-size:10px;color:var(--t3);font-weight:400">· by sessions</span></div>
+          <div id="lb-list">
+            <div style="color:var(--t2);font-size:13px;padding:8px">Loading…</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:var(--gap)">
+          <div class="card-title">Members <span style="font-size:10px;color:var(--t3);font-weight:400">· follow &amp; message</span></div>
+          <div id="members-list" style="margin-top:6px">
+            <div style="color:var(--t2);font-size:13px;padding:8px">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DM drawer -->
+    <div class="dm-overlay" id="dm-overlay"></div>
+    <aside class="dm-drawer" id="dm-drawer">
+      <div class="dm-head">
+        <div class="member-av" id="dm-av">–</div>
+        <div style="flex:1;min-width:0">
+          <div id="dm-name" style="font-weight:800;font-size:14px">—</div>
+          <div id="dm-role" style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px">—</div>
+        </div>
+        <button class="form-close" id="dm-close">✕</button>
+      </div>
+      <div class="dm-msgs" id="dm-msgs"></div>
+      <div class="dm-input-row">
+        <input id="dm-input" class="form-input" type="text" placeholder="Type a message…" style="flex:1;padding:9px 12px;font-size:13px" autocomplete="off">
+        <button id="dm-send" class="btn-accent" style="padding:9px 16px">Send</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<button class="fab">+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+
+  const esc = (t) => (t || '').replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+  const timeAgo = (ts) => {
+    const s = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+    if (s < 60)    return 'just now';
+    if (s < 3600)  return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
+  };
+
+  // ── Author identity (for new posts) ──
+  let authorName = 'Member';
+  let meEmail    = '';
+  const authorRole = (window._apexRole || 'member');
+  const roleLabel  = authorRole.charAt(0).toUpperCase() + authorRole.slice(1);
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    const m = user && user.user_metadata || {};
+    meEmail    = (user && user.email) || '';
+    authorName = m.full_name || m.display_name || m.name
+               || (user && user.email ? user.email.split('@')[0] : 'Member');
+  } catch (_) {}
+
+  // ── Activity feed ──
+  const feedList = document.getElementById('feed-list');
+  async function renderFeed() {
+    const posts = await loadPosts(30);
+    if (!posts.length) {
+      feedList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);font-size:13px">No posts yet — be the first to share something.</div>';
+      return;
+    }
+    feedList.innerHTML = posts.map(p => `
+      <div class="comm-post" data-author-email="${esc(p.author_email || '')}">
+        <div class="comm-post-head">
+          ${avCircle('post-av', p.author_email ? avatarMap.get(p.author_email) : null, 'user', true)}
+          <div>
+            <div style="font-weight:700;font-size:13px">${esc(p.author_name)}</div>
+            <div class="post-meta">${esc(p.author_role || '')} · ${timeAgo(p.created_at)}</div>
+          </div>
+        </div>
+        ${p.body ? `<div class="post-body">${esc(p.body)}</div>` : ''}
+        ${p.media_url ? (p.media_type === 'video'
+          ? `<video src="${p.media_url}" controls preload="metadata" style="width:100%;max-height:440px;border-radius:10px;margin-top:10px;background:#000"></video>`
+          : `<img src="${p.media_url}" loading="lazy" alt="" style="width:100%;max-height:440px;object-fit:cover;border-radius:10px;margin-top:10px">`) : ''}
+        <div class="post-actions">
+          <span class="post-act like-btn" data-id="${p.id}" data-likes="${p.likes}"><span data-icon="thumbsUp"></span> ${p.likes} Likes</span>
+        </div>
+      </div>`).join('');
+    renderIcons(feedList);
+    feedList.querySelectorAll('.like-btn').forEach(btn =>
+      btn.addEventListener('click', async () => {
+        const n = parseInt(btn.dataset.likes, 10) + 1;
+        btn.dataset.likes = n;
+        btn.innerHTML = `<span data-icon="thumbsUp"></span> ${n} Likes`;
+        renderIcons(btn);
+        await likePost(btn.dataset.id, n);
+      }));
+  }
+
+  // ── Composer: attach photo/video ──
+  let pendingFile = null;
+  const postFile    = document.getElementById('post-file');
+  const postAttach  = document.getElementById('post-attach');
+  const mediaPrev   = document.getElementById('post-media-preview');
+
+  const clearMedia = () => { pendingFile = null; postFile.value = ''; mediaPrev.style.display = 'none'; mediaPrev.innerHTML = ''; };
+  postAttach.addEventListener('click', () => postFile.click());
+  postFile.addEventListener('change', () => {
+    const f = postFile.files && postFile.files[0];
+    if (!f) { clearMedia(); return; }
+    // guardrail: cap video size so uploads stay reasonable
+    if (f.type.startsWith('video/') && f.size > 100 * 1024 * 1024) {
+      if (window.toast) window.toast('Video too large (max 100 MB)', 'error');
+      clearMedia(); return;
+    }
+    pendingFile = f;
+    const url = URL.createObjectURL(f);
+    const isVid = f.type.startsWith('video/');
+    mediaPrev.innerHTML = `
+      ${isVid
+        ? `<video src="${url}" controls style="width:100%;max-height:260px;border-radius:10px;background:#000"></video>`
+        : `<img src="${url}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:10px">`}
+      <button id="post-media-remove" title="Remove"
+        style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;background:rgba(0,0,0,.65);color:#fff;font-size:13px">✕</button>`;
+    mediaPrev.style.display = 'block';
+    mediaPrev.querySelector('#post-media-remove').addEventListener('click', clearMedia);
+  });
+
+  document.getElementById('post-btn').addEventListener('click', async () => {
+    const input = document.getElementById('post-input');
+    const body  = input.value.trim();
+    if (!body && !pendingFile) return;
+    const btn = document.getElementById('post-btn');
+    btn.disabled = true; btn.textContent = 'Posting…';
+    try {
+      let media = null;
+      if (pendingFile) {
+        btn.textContent = 'Uploading…';
+        media = await uploadPostMedia(pendingFile);
+      }
+      await savePost(authorName, roleLabel, body, media, meEmail);
+      input.value = '';
+      clearMedia();
+      if (window.toast) window.toast('Posted! 🎉', 'success');
+      await renderFeed();
+    } catch (err) {
+      if (window.toast) window.toast(err.message || 'Post failed', 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Post';
+    }
+  });
+
+  // Feed renders immediately — user sees posts right away
+  await renderFeed();
+
+  // Load ranking + directory in parallel while user is already reading the feed
+  const [ranking, _communityDir] = await Promise.all([loadCommunityRanking(), loadDirectory()]);
+  avatarMap = new Map(_communityDir.filter(u => u.avatar_url).map(u => [u.email, u.avatar_url]));
+
+  // Hydrate post avatars in-place — no second DB fetch needed
+  if (avatarMap.size > 0) {
+    document.querySelectorAll('#feed-list .comm-post[data-author-email]').forEach(el => {
+      const email = el.dataset.authorEmail;
+      const url = email && avatarMap.get(email);
+      if (!url) return;
+      const avEl = el.querySelector('.post-av');
+      if (avEl) { avEl.style.padding = '0'; avEl.style.overflow = 'hidden'; avEl.innerHTML = `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">`; }
+    });
+  }
+
+  // ── Top athletes + leaderboard (real, by sessions logged) ──
+
+  const athletesEl = document.getElementById('top-athletes');
+  const top3 = ranking.filter(r => r.sessions > 0).slice(0, 3);
+  athletesEl.innerHTML = top3.length ? top3.map((r, i) => `
+    <div class="comm-card">
+      ${avCircle('comm-avatar', r.avatar_url, i === 0 ? 'award' : 'flame', true)}
+      <div class="comm-name">${esc(r.name)}</div>
+      <div class="comm-role">${i === 0 ? 'Top Athlete' : 'Rising Star'}</div>
+      <div class="comm-stat">${r.sessions} session${r.sessions !== 1 ? 's' : ''} logged</div>
+    </div>`).join('')
+    : '<div style="color:var(--t2);font-size:13px;padding:8px">No sessions logged yet.</div>';
+  renderIcons(athletesEl);
+
+  const lbList = document.getElementById('lb-list');
+  const top8   = ranking.slice(0, 8);
+  const medal  = ['gold', 'silver', ''];
+  lbList.innerHTML = top8.length ? top8.map((r, i) => `
+    <div class="lb-item">
+      <div class="lb-rank ${i < 3 ? medal[i] : ''}" ${i === 2 ? 'style="color:var(--accent)"' : ''}>${i + 1}</div>
+      ${avCircle('lb-av', r.avatar_url, i < 3 ? 'award' : 'user', true)}
+      <div class="lb-name">${esc(r.name)}</div>
+      <div class="lb-pts">${r.sessions} pts</div>
+    </div>`).join('')
+    : '<div style="color:var(--t2);font-size:13px;padding:8px">No members yet.</div>';
+  renderIcons(lbList);
+
+  // ════════════ MEMBERS: follow + DM ════════════
+  const initials = (n) => (n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const avCircle = (cls, url, fallback, isIcon = false) => url
+    ? `<div class="${cls}" style="padding:0;overflow:hidden"><img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`
+    : isIcon ? `<div class="${cls}" data-icon="${fallback}"></div>` : `<div class="${cls}">${fallback}</div>`;
+  let avatarMap = new Map();
+  const membersEl = document.getElementById('members-list');
+
+  async function renderMembers(preloadedDir) {
+    const [dir, following] = await Promise.all([preloadedDir ? Promise.resolve(preloadedDir) : loadDirectory(), loadFollowing(meEmail)]);
+    const others = dir.filter(u => u.email && u.email.toLowerCase() !== meEmail.toLowerCase());
+    if (!others.length) {
+      membersEl.innerHTML = '<div style="color:var(--t2);font-size:13px;padding:8px">No other members yet.</div>';
+      return;
+    }
+    membersEl.innerHTML = others.map(u => {
+      const isF = following.has(u.email);
+      return `
+        <div class="member-row" data-email="${esc(u.email)}" data-name="${esc(u.name)}" data-role="${esc(u.role)}">
+          ${avCircle('member-av', u.avatar_url, initials(u.name))}
+          <div class="member-info">
+            <div class="member-name">${esc(u.name)}</div>
+            <div class="member-role">${esc(u.role)}</div>
+          </div>
+          <div class="member-acts">
+            <button class="mini-btn follow-btn ${isF ? 'following' : ''}">${isF ? 'Following' : 'Follow'}</button>
+            <button class="mini-btn msg-btn">Message</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    membersEl.querySelectorAll('.follow-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const row = btn.closest('.member-row');
+        const email = row.dataset.email;
+        const isF = btn.classList.contains('following');
+        btn.disabled = true;
+        try {
+          if (isF) { await unfollowUser(meEmail, email); btn.classList.remove('following'); btn.textContent = 'Follow'; }
+          else     { await followUser(meEmail, email);   btn.classList.add('following');    btn.textContent = 'Following';
+                     if (window.toast) window.toast(`Following ${row.dataset.name} ✓`, 'success', 1500); }
+        } catch (_) { if (window.toast) window.toast('Action failed', 'error'); }
+        finally { btn.disabled = false; }
+      });
+    });
+    membersEl.querySelectorAll('.msg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('.member-row');
+        openDM(row.dataset.email, row.dataset.name, row.dataset.role);
+      });
+    });
+  }
+
+  // ── DM drawer ──
+  let _dmOther = null, _dmPoll = null;
+  const dmOverlay = document.getElementById('dm-overlay');
+  const dmDrawer  = document.getElementById('dm-drawer');
+  const dmMsgs    = document.getElementById('dm-msgs');
+  const dmInput   = document.getElementById('dm-input');
+
+  async function renderConversation(scroll) {
+    if (!_dmOther) return;
+    const msgs = await loadConversation(meEmail, _dmOther);
+    dmMsgs.innerHTML = msgs.length ? msgs.map(m => {
+      const mine = (m.sender_email || '').toLowerCase() === meEmail.toLowerCase();
+      const t = new Date(m.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return `<div class="dm-bubble ${mine ? 'me' : 'them'}">${esc(m.body)}<span class="dm-time">${t}</span></div>`;
+    }).join('') : '<div style="color:var(--t2);font-size:12px;text-align:center;margin:auto">No messages yet — say hi 👋</div>';
+    if (scroll) dmMsgs.scrollTop = dmMsgs.scrollHeight;
+  }
+
+  function openDM(email, name, role) {
+    _dmOther = email;
+    const _dmAvEl = document.getElementById('dm-av');
+    const _dmAvUrl = email && avatarMap.get(email);
+    if (_dmAvUrl) { _dmAvEl.innerHTML = `<img src="${_dmAvUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">`; }
+    else { _dmAvEl.textContent = initials(name); }
+    document.getElementById('dm-name').textContent = name;
+    document.getElementById('dm-role').textContent = role;
+    dmOverlay.classList.add('open');
+    dmDrawer.classList.add('open');
+    renderConversation(true);
+    clearInterval(_dmPoll);
+    _dmPoll = setInterval(() => renderConversation(false), 3000); // live-ish updates
+    dmInput.focus();
+  }
+  function closeDM() {
+    dmOverlay.classList.remove('open');
+    dmDrawer.classList.remove('open');
+    clearInterval(_dmPoll); _dmPoll = null; _dmOther = null;
+  }
+  document.getElementById('dm-close').addEventListener('click', closeDM);
+  dmOverlay.addEventListener('click', closeDM);
+
+  async function doSend() {
+    const body = dmInput.value.trim();
+    if (!body || !_dmOther) return;
+    dmInput.value = '';
+    try {
+      await sendMessage(meEmail, _dmOther, body);
+      await renderConversation(true);
+    } catch (_) {
+      dmInput.value = body;
+      if (window.toast) window.toast('Could not send', 'error');
+    }
+  }
+  document.getElementById('dm-send').addEventListener('click', doSend);
+  dmInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doSend(); } });
+
+  // Let the topbar search open a DM directly when we're already on this page
+  window._apexOpenDM = openDM;
+  // Auto-open a DM if arrived via ?dm=email
+  try {
+    const params = new URLSearchParams(location.search);
+    const dmEmail = params.get('dm');
+    if (dmEmail) openDM(dmEmail, params.get('name') || dmEmail.split('@')[0], params.get('role') || '');
+  } catch (_) {}
+
+  await renderMembers(_communityDir);
+})();
+</script>
+</body>
+</html>
