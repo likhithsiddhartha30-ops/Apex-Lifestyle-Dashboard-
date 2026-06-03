@@ -10,7 +10,7 @@
 <body>
 
 <aside class="sidebar">
-  <div class="sb-brand"><div class="sb-brand-text">Apex<br>Lifestyle</div></div>
+  <div class="sb-brand"><img class="sb-brand-img" src="images/logo.png" alt="ApexLifestyle"></div>
   <div class="sb-user">
     <div class="sb-uname" id="sb-admin-name">—</div>
     <div class="sb-umode" id="sb-admin-role">Admin</div>
@@ -37,7 +37,7 @@
 
 <main class="main">
   <header class="topbar">
-    <span class="topbar-brand">ApexLifestyle</span>
+    <img class="topbar-logo" src="images/logo.png" alt="ApexLifestyle">
     <div class="search">
       <span class="search-icon">🔍</span>
       <input type="text" placeholder="Search food database...">
@@ -281,7 +281,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Time</label>
-        <input class="form-input" id="mf-time" type="text" placeholder="07:30 AM">
+        <input class="form-input" id="mf-time" type="time">
       </div>
       <div class="form-group">
         <label class="form-label">Calories (kcal) *</label>
@@ -335,12 +335,37 @@ let _nutCid        = null;
 let _nutDate       = getTodayIST();
 let _editingMealId = null;
 
+/* ── Time format helpers ────────────────────────────────── */
+// Stored/displayed format is 12-hour "07:30 AM"; the <input type="time">
+// picker works in 24-hour "HH:MM". Convert between the two.
+function timeTo24h(s) {
+  if (!s) return '';
+  const m = String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if (!m) return '';
+  let h = parseInt(m[1], 10);
+  const min = m[2];
+  const ap = m[3] ? m[3].toUpperCase() : null;
+  if (ap === 'PM' && h < 12) h += 12;
+  if (ap === 'AM' && h === 12) h = 0;
+  return String(h).padStart(2, '0') + ':' + min;
+}
+function timeTo12h(s) {
+  if (!s) return null;
+  const m = String(s).trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return s; // already in display format
+  let h = parseInt(m[1], 10);
+  const min = m[2];
+  const ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if (h === 0) h = 12;
+  return String(h).padStart(2, '0') + ':' + min + ' ' + ap;
+}
+
 /* ── Form open / close ──────────────────────────────────── */
 function openMealForm(meal = null) {
   _editingMealId = meal ? meal.id : null;
   document.getElementById('meal-panel-title').textContent  = meal ? 'Edit Meal' : 'Add Meal';
   document.getElementById('mf-name').value        = meal ? (meal.name        || '') : '';
-  document.getElementById('mf-time').value        = meal ? (meal.time        || '') : '';
+  document.getElementById('mf-time').value        = meal ? timeTo24h(meal.time) : '';
   document.getElementById('mf-calories').value    = meal ? (meal.calories    || '') : '';
   document.getElementById('mf-protein').value     = meal ? (meal.protein     || '') : '';
   document.getElementById('mf-carbs').value       = meal ? (meal.carbs       || '') : '';
@@ -742,7 +767,7 @@ async function renderNutrition() {
     const errEl      = document.getElementById('mf-err');
 
     const name        = document.getElementById('mf-name').value.trim();
-    const time        = document.getElementById('mf-time').value.trim()        || null;
+    const time        = timeTo12h(document.getElementById('mf-time').value.trim()) || null;
     const calories    = parseFloat(document.getElementById('mf-calories').value)    || 0;
     const protein     = parseFloat(document.getElementById('mf-protein').value)     || 0;
     const carbs       = parseFloat(document.getElementById('mf-carbs').value)       || 0;

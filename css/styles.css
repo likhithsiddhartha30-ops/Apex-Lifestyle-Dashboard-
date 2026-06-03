@@ -86,6 +86,13 @@ body {
   letter-spacing: 2px;
   line-height: 1.1;
 }
+.sb-brand-img {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+}
 
 .sb-user {
   padding: 0 18px 16px;
@@ -215,6 +222,7 @@ body {
   display: block;
   text-align: center;
 }
+.sidebar:not(:hover) .sb-brand-img { max-width: 34px; margin: 0 auto; }
 .sidebar:not(:hover) .sb-brand { padding: 0 0 18px; }
 .sidebar:not(:hover) .sb-user  { padding: 0 0 16px; }
 .sidebar:not(:hover) .sb-uname,
@@ -252,6 +260,12 @@ body {
   text-transform: uppercase;
   letter-spacing: 2px;
   white-space: nowrap;
+}
+.topbar-logo {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .search {
   display: flex;
@@ -301,8 +315,24 @@ body {
   border: 1.5px solid var(--bg2);
 }
 
-/* Topbar: notifications bell + settings gear removed (search re-purposed for member search) */
+/* Topbar: settings gear removed (search re-purposed for member search) */
 .tb-right .icon-btn { display: none; }
+
+/* Notification bell — re-enabled, sits just before the profile avatar */
+.tb-right .notif-bell { display: flex; }
+.notif-bell .notif-dot {
+  display: none;
+  top: -4px; right: -4px;
+  width: auto; min-width: 16px; height: 16px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--red);
+  border: 2px solid var(--bg2);
+  color: #fff;
+  font-size: 9px; font-weight: 800; line-height: 1;
+  align-items: center; justify-content: center;
+}
+.notif-bell.has-unread .notif-dot { display: flex; }
 
 /* Member search dropdown */
 .topbar .search { position: relative; }
@@ -1257,6 +1287,8 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; 
   outline: none; transition: border-color 0.15s;
 }
 .form-input:focus { border-color: var(--accent); }
+/* White the dark native time/date picker icon so it shows on the dark field */
+.form-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 .form-actions { display: flex; gap: 10px; margin-top: 8px; }
 .form-actions button { flex: 1; padding: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
 .sleep-state { font-size: 9px; color: var(--t2); text-transform: uppercase; letter-spacing: 1px; }

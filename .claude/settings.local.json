@@ -23,7 +23,9 @@
       "Bash(Select-String -Pattern \"\\(models|schema|db\\)\")",
       "Bash(copy \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\client-inbox.html\" \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\coach-inbox.html\")",
       "Bash(copy \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\client-inbox.html\" \"C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\admin-inbox.html\")",
-      "Bash(powershell -Command \"\\(Get-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\coach-inbox.html'\\) -replace '<title>ApexLifestyle — Inbox</title>', '<title>ApexLifestyle — Inbox \\(Coach\\)</title>' | Set-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\coach-inbox.html' -Encoding utf8; \\(Get-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\admin-inbox.html'\\) -replace '<title>ApexLifestyle — Inbox</title>', '<title>ApexLifestyle — Inbox \\(Admin\\)</title>' | Set-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\admin-inbox.html' -Encoding utf8; Write-Host 'Done'\")"
+      "Bash(powershell -Command \"\\(Get-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\coach-inbox.html'\\) -replace '<title>ApexLifestyle — Inbox</title>', '<title>ApexLifestyle — Inbox \\(Coach\\)</title>' | Set-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\coach-inbox.html' -Encoding utf8; \\(Get-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\admin-inbox.html'\\) -replace '<title>ApexLifestyle — Inbox</title>', '<title>ApexLifestyle — Inbox \\(Admin\\)</title>' | Set-Content 'C:\\\\Users\\\\likhi\\\\OneDrive\\\\Desktop\\\\ApexLifestyle\\\\admin-inbox.html' -Encoding utf8; Write-Host 'Done'\")",
+      "Bash(npx --version)",
+      "Bash(grep -i \"\\\\.js$\")"
     ]
   }
 }

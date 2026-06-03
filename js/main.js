@@ -146,6 +146,10 @@ async function apexNavigate(url, isPopState) {
   /* 5. Re-render icons in swapped content */
   window.renderIcons(content);
 
+  /* 5b. Keep the notification badge in sync. Landing on the inbox clears it. */
+  if (pg.includes('inbox') && typeof markNotificationsSeen === 'function') markNotificationsSeen();
+  if (typeof refreshNotifications === 'function') refreshNotifications();
+
   /* 6. Execute the page-specific inline script
         Each page uses: (window._apexPageInit = async () => { ... })()  */
   const pageScript = [...doc.querySelectorAll('body > script:not([src])')].pop();
@@ -507,6 +511,77 @@ function injectInboxFab() {
   });
 }
 
+/* ════════════════════════════════════
+   NOTIFICATIONS — bell + red badge in the topbar.
+   "Unread" = messages addressed to me that arrived after the last time
+   I opened my inbox. The messages table has no read flag, so we track the
+   last-seen moment in localStorage.
+   ════════════════════════════════════ */
+const APEX_SEEN_KEY = 'apex_inbox_seen';
+
+function markNotificationsSeen() {
+  try { localStorage.setItem(APEX_SEEN_KEY, String(Date.now())); } catch (_) {}
+}
+
+async function apexUnreadCount() {
+  if (typeof db === 'undefined') return 0;
+  try {
+    const { data } = await db.auth.getUser();
+    const email = data && data.user && data.user.email;
+    if (!email) return 0;
+    const seen = parseInt(localStorage.getItem(APEX_SEEN_KEY) || '0', 10);
+    const { data: msgs, error } = await db.from('messages')
+      .select('sender_email,created_at')
+      .eq('recipient_email', email)
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return (msgs || []).filter(m =>
+      m.sender_email && m.sender_email.toLowerCase() !== email.toLowerCase() &&
+      new Date(m.created_at).getTime() > seen
+    ).length;
+  } catch (e) {
+    console.warn('[Notif] unread:', e.message);
+    return 0;
+  }
+}
+
+async function refreshNotifications() {
+  const bell = document.querySelector('.tb-right .notif-bell');
+  if (!bell) return;
+  const n = await apexUnreadCount();
+  const dot = bell.querySelector('.notif-dot');
+  if (dot) dot.textContent = n > 9 ? '9+' : (n || '');
+  bell.classList.toggle('has-unread', n > 0);
+}
+
+function injectNotifications() {
+  // The bell is the topbar icon-btn that carries the .notif-dot (gear has none).
+  const dot  = document.querySelector('.tb-right .icon-btn .notif-dot');
+  const bell = dot ? dot.closest('.icon-btn') : null;
+  if (!bell || bell._wired) return;
+  bell._wired = true;
+  bell.classList.add('notif-bell');
+  bell.title = 'Notifications';
+
+  bell.addEventListener('click', () => {
+    markNotificationsSeen();
+    bell.classList.remove('has-unread');
+    const d = bell.querySelector('.notif-dot');
+    if (d) d.textContent = '';
+    const role = window._apexRole || 'client';
+    const dest = `${role}-inbox.html`;
+    if (typeof apexNavigate === 'function') apexNavigate(dest);
+    else window.location.href = dest;
+  });
+
+  // Opening the inbox directly counts as seeing everything.
+  const page = (window.location.pathname.split('/').pop() || '').toLowerCase();
+  if (page.includes('inbox')) markNotificationsSeen();
+
+  refreshNotifications();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Render all icons ── */
@@ -514,6 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Profile dropdown ── */
   injectProfileMenu();
+
+  /* ── Notifications bell ── */
+  injectNotifications();
 
   /* ── Inbox FAB ── */
   injectInboxFab();
