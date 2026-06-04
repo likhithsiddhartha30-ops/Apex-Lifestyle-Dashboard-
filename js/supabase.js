@@ -488,6 +488,29 @@ async function unfollowUser(follower, following) {
   } catch (e) { console.warn('[Supabase] unfollowUser:', e.message); throw e; }
 }
 
+// Follower / following counts for a user (by email)
+async function loadFollowCounts(email) {
+  try {
+    const [followersRes, followingRes] = await Promise.all([
+      db.from('follows').select('*', { count: 'exact', head: true }).eq('following_email', email),
+      db.from('follows').select('*', { count: 'exact', head: true }).eq('follower_email', email),
+    ]);
+    return { followers: followersRes.count || 0, following: followingRes.count || 0 };
+  } catch (e) {
+    console.warn('[Supabase] loadFollowCounts:', e.message);
+    return { followers: 0, following: 0 };
+  }
+}
+
+// Does `me` follow `other`?
+async function isFollowing(me, other) {
+  try {
+    const { data } = await db.from('follows').select('follower_email')
+      .eq('follower_email', me).eq('following_email', other).maybeSingle();
+    return !!data;
+  } catch (_) { return false; }
+}
+
 async function loadConversation(me, other) {
   try {
     const { data, error } = await db.from('messages').select('*')

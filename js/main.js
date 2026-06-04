@@ -428,7 +428,138 @@ function injectProfileMenu() {
 }
 
 /* ════════════════════════════════════
-   TOPBAR MEMBER SEARCH — find a coach / friend, open a DM
+   START A DM — open the drawer if we're on a page that has it,
+   otherwise hop to the community page with ?dm= so it auto-opens.
+   ════════════════════════════════════ */
+function apexStartDM(email, name, role) {
+  if (typeof window._apexOpenDM === 'function') {
+    window._apexOpenDM(email, name, role);
+    return;
+  }
+  const r   = window._apexRole || 'client';
+  const url = `${r}-community.html?dm=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role || '')}`;
+  if (typeof apexNavigate === 'function') apexNavigate(url);
+  else window.location.href = url;
+}
+
+/* ════════════════════════════════════
+   MEMBER PROFILE — a lightweight card shown when you tap a member
+   in search. Avatar, role, follower/following counts + Follow & Message.
+   ════════════════════════════════════ */
+let _apexProfileEmail = null;   // who the open card is for
+let _apexMeEmailCache = null;
+
+async function apexMyEmail() {
+  if (_apexMeEmailCache !== null) return _apexMeEmailCache;
+  try {
+    const { data } = await db.auth.getUser();
+    _apexMeEmailCache = (data && data.user && data.user.email) || '';
+  } catch (_) { _apexMeEmailCache = ''; }
+  return _apexMeEmailCache;
+}
+
+function apexEnsureProfileModal() {
+  let ov = document.querySelector('.apex-profile-overlay');
+  if (ov) return ov;
+  ov = document.createElement('div');
+  ov.className = 'apex-profile-overlay';
+  ov.innerHTML = `
+    <div class="apex-profile-card" role="dialog" aria-modal="true">
+      <button class="apex-profile-close" aria-label="Close">&times;</button>
+      <div class="apex-profile-av" id="apx-prof-av"></div>
+      <div class="apex-profile-name" id="apx-prof-name">—</div>
+      <div class="apex-profile-role" id="apx-prof-role"></div>
+      <div class="apex-profile-stats">
+        <div class="apex-profile-stat"><b id="apx-prof-followers">–</b><span>Followers</span></div>
+        <div class="apex-profile-stat"><b id="apx-prof-following">–</b><span>Following</span></div>
+      </div>
+      <div class="apex-profile-actions" id="apx-prof-actions"></div>
+      <div class="apex-profile-note" id="apx-prof-note" style="display:none"></div>
+    </div>`;
+  document.body.appendChild(ov);
+
+  const close = () => { ov.classList.remove('open'); _apexProfileEmail = null; };
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  ov.querySelector('.apex-profile-close').addEventListener('click', close);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  ov._close = close;
+  return ov;
+}
+
+async function apexShowProfile(user) {
+  if (!user || !user.email) return;
+  const ov = apexEnsureProfileModal();
+  _apexProfileEmail = user.email;
+
+  const esc = t => (t || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const initials = n => (n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+  // Header
+  const avEl = ov.querySelector('#apx-prof-av');
+  avEl.innerHTML = user.avatar_url
+    ? `<img src="${esc(user.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">`
+    : initials(user.name);
+  ov.querySelector('#apx-prof-name').textContent = user.name || user.email.split('@')[0];
+  ov.querySelector('#apx-prof-role').textContent = user.role || '';
+
+  // Reset stats while we fetch
+  ov.querySelector('#apx-prof-followers').textContent = '–';
+  ov.querySelector('#apx-prof-following').textContent = '–';
+
+  ov.classList.add('open');
+
+  const me      = await apexMyEmail();
+  const isMe    = me && me.toLowerCase() === user.email.toLowerCase();
+  const actions = ov.querySelector('#apx-prof-actions');
+  const note    = ov.querySelector('#apx-prof-note');
+
+  if (isMe) {
+    actions.style.display = 'none';
+    note.style.display = '';
+    note.textContent = 'This is you';
+  } else {
+    actions.style.display = '';
+    note.style.display = 'none';
+    const following = typeof isFollowing === 'function' ? await isFollowing(me, user.email) : false;
+    if (_apexProfileEmail !== user.email) return; // a newer card opened meanwhile
+    actions.innerHTML = `
+      <button class="btn-outline apx-prof-follow ${following ? 'following' : ''}">${following ? 'Following' : 'Follow'}</button>
+      <button class="btn-accent apx-prof-msg">Message</button>`;
+
+    actions.querySelector('.apx-prof-msg').addEventListener('click', () => {
+      ov._close();
+      apexStartDM(user.email, user.name, user.role);
+    });
+    const followBtn = actions.querySelector('.apx-prof-follow');
+    followBtn.addEventListener('click', async () => {
+      if (!me) return;
+      const isF = followBtn.classList.contains('following');
+      followBtn.disabled = true;
+      try {
+        if (isF) { await unfollowUser(me, user.email); followBtn.classList.remove('following'); followBtn.textContent = 'Follow'; }
+        else     { await followUser(me, user.email);   followBtn.classList.add('following');    followBtn.textContent = 'Following';
+                   if (window.toast) window.toast(`Following ${user.name || 'member'} ✓`, 'success', 1500); }
+        const c = await loadFollowCounts(user.email);
+        if (_apexProfileEmail === user.email) ov.querySelector('#apx-prof-followers').textContent = c.followers;
+      } catch (_) { if (window.toast) window.toast('Action failed', 'error'); }
+      finally { followBtn.disabled = false; }
+    });
+  }
+
+  // Stats (async; ignore if the card has since changed)
+  if (typeof loadFollowCounts === 'function') {
+    const counts = await loadFollowCounts(user.email);
+    if (_apexProfileEmail === user.email) {
+      ov.querySelector('#apx-prof-followers').textContent = counts.followers;
+      ov.querySelector('#apx-prof-following').textContent = counts.following;
+    }
+  }
+}
+window.apexShowProfile = apexShowProfile;
+window.apexStartDM     = apexStartDM;
+
+/* ════════════════════════════════════
+   TOPBAR MEMBER SEARCH — find a coach / friend, view profile or DM
    ════════════════════════════════════ */
 function initMemberSearch() {
   const search = document.querySelector('.topbar .search');
@@ -458,7 +589,7 @@ function initMemberSearch() {
       .filter(u => (u.name || '').toLowerCase().includes(q) || (u.role || '').toLowerCase().includes(q))
       .slice(0, 8);
     results.innerHTML = matches.length ? matches.map(u => `
-      <div class="search-res-item" data-email="${esc(u.email)}" data-name="${esc(u.name)}" data-role="${esc(u.role)}">
+      <div class="search-res-item" data-email="${esc(u.email)}" data-name="${esc(u.name)}" data-role="${esc(u.role)}" data-avatar="${esc(u.avatar_url || '')}">
         ${u.avatar_url
           ? `<div class="member-av" style="padding:0;overflow:hidden"><img src="${esc(u.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`
           : `<div class="member-av">${initials(u.name)}</div>`}
@@ -470,16 +601,15 @@ function initMemberSearch() {
       </div>`).join('') : '<div class="search-res-empty">No members found</div>';
 
     results.querySelectorAll('.search-res-item').forEach(it => {
-      it.addEventListener('click', () => {
-        const email = it.dataset.email, name = it.dataset.name, r = it.dataset.role;
+      const u = { name: it.dataset.name, email: it.dataset.email, role: it.dataset.role, avatar_url: it.dataset.avatar || null };
+      // Tapping the row → view the member's profile
+      it.addEventListener('click', () => { close(); input.value = ''; apexShowProfile(u); });
+      // The "Message" chip → jump straight into a DM
+      const msgBtn = it.querySelector('.mini-btn');
+      if (msgBtn) msgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         close(); input.value = '';
-        if (typeof window._apexOpenDM === 'function') {
-          window._apexOpenDM(email, name, r);       // already on community page
-        } else {
-          const url = `${role}-community.html?dm=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(r)}`;
-          if (typeof apexNavigate === 'function') apexNavigate(url);
-          else window.location.href = url;
-        }
+        apexStartDM(u.email, u.name, u.role);
       });
     });
     results.classList.add('open');

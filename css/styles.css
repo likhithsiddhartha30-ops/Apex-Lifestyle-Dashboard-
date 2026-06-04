@@ -1541,6 +1541,51 @@ input[type="checkbox"]:active { transform: scale(1.25); }
 .mini-btn:hover { border-color: var(--accent); color: var(--accent); }
 .mini-btn.following { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+/* ── Member profile card (opened from search) ── */
+.apex-profile-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 10000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.apex-profile-overlay.open { opacity: 1; pointer-events: auto; }
+.apex-profile-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  width: 100%; max-width: 360px; padding: 30px 24px 24px; position: relative;
+  box-shadow: 0 24px 70px rgba(0,0,0,.6);
+  transform: translateY(10px) scale(.97); transition: transform .2s cubic-bezier(.2,.8,.2,1);
+}
+.apex-profile-overlay.open .apex-profile-card { transform: none; }
+.apex-profile-close {
+  position: absolute; top: 10px; right: 12px; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; color: var(--t2); font-size: 22px;
+  border-radius: 8px; cursor: pointer; transition: background .15s, color .15s;
+}
+.apex-profile-close:hover { background: rgba(255,255,255,.08); color: var(--t1); }
+.apex-profile-av {
+  width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 14px;
+  background: var(--accent-dim); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Lato', sans-serif; font-size: 32px; font-weight: 800; overflow: hidden;
+}
+.apex-profile-name {
+  text-align: center; font-family: 'Lato', sans-serif; font-size: 21px;
+  font-weight: 800; letter-spacing: .3px;
+}
+.apex-profile-role {
+  text-align: center; font-size: 10px; color: var(--accent); margin-top: 4px;
+  text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;
+}
+.apex-profile-stats {
+  display: flex; justify-content: center; gap: 36px; margin: 20px 0 22px;
+}
+.apex-profile-stat { text-align: center; }
+.apex-profile-stat b { display: block; font-family: 'Lato', sans-serif; font-size: 22px; font-weight: 900; }
+.apex-profile-stat span { font-size: 10px; color: var(--t2); text-transform: uppercase; letter-spacing: 1px; }
+.apex-profile-actions { display: flex; gap: 10px; }
+.apex-profile-actions button { flex: 1; padding: 11px; font-size: 12px; }
+.apex-profile-note { text-align: center; color: var(--t2); font-size: 12px; padding: 6px 0; }
+
 /* ── DM drawer ── */
 .dm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s; }
 .dm-overlay.open { opacity: 1; pointer-events: auto; }
@@ -1655,11 +1700,24 @@ input[type="checkbox"]:active { transform: scale(1.25); }
   }
   body.mobile-nav-open .mobile-nav-backdrop { opacity: 1; pointer-events: auto; }
 
-  /* ── Topbar tightening ── */
-  .topbar { padding: 0 12px; gap: 10px; }
-  .topbar .search { display: none; }
+  /* ── Topbar: wrap to two rows so search gets a full-width line ── */
+  .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--topbar-h);
+    padding: 9px 12px;
+    row-gap: 9px;
+    gap: 10px;
+  }
   .topbar-logo { height: 28px; }
   .tb-right { gap: 8px; }
+  /* Member search drops onto its own row, spanning the topbar */
+  .topbar .search {
+    display: flex;
+    order: 10;
+    flex: 1 1 100%;
+    max-width: none;
+  }
 
   /* ── Content padding ── */
   .page-content { padding: 18px 14px; }

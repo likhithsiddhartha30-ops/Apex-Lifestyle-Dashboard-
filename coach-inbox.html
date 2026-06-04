@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ApexLifestyle â€” Inbox</title>
+<title>ApexLifestyle — Inbox</title>
 <link rel="stylesheet" href="css/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -12,18 +12,18 @@
 <aside class="sidebar">
   <div class="sb-brand"><img class="sb-brand-img" src="images/logo.png" alt="ApexLifestyle"></div>
   <div class="sb-user">
-    <div class="sb-uname" id="sb-admin-name">â€”</div>
+    <div class="sb-uname" id="sb-admin-name">—</div>
     <div class="sb-umode" id="sb-admin-role">Client</div>
     <div class="sb-client-label">Viewing Client</div>
     <select id="client-select" class="client-select">
-      <option value="">Select clientâ€¦</option>
+      <option value="">Select client…</option>
     </select>
   </div>
   <nav class="sb-nav"></nav>
   <div class="sb-bottom">
     <div class="sb-links">
-      <a class="sb-link" href="#">â“ª Support</a>
-      <a class="sb-link" href="#" onclick="signOut();return false;">â» Logout</a>
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
     </div>
   </div>
 </aside>
@@ -32,13 +32,13 @@
   <header class="topbar">
     <img class="topbar-logo" src="images/logo.png" alt="ApexLifestyle">
     <div class="search">
-      <span class="search-icon">ðŸ”</span>
-      <input type="text" placeholder="Search membersâ€¦">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search members…">
     </div>
     <div class="tb-right">
-      <div class="icon-btn">ðŸ””<span class="notif-dot"></span></div>
-      <div class="icon-btn">âš™</div>
-      <div class="avatar">ðŸ§‘</div>
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
     </div>
   </header>
 
@@ -48,10 +48,10 @@
     <div class="pg-sub" id="inbox-sub">Your conversations</div>
 
     <div class="card" style="max-width:680px;margin-top:var(--gap)">
-      <input id="conv-search" class="form-input" type="text" placeholder="Search conversationsâ€¦"
+      <input id="conv-search" class="form-input" type="text" placeholder="Search conversations…"
         style="width:100%;margin-bottom:12px;padding:8px 12px;font-size:13px">
       <div id="conv-list">
-        <div style="padding:24px;text-align:center;color:var(--t2);font-size:13px">Loading conversationsâ€¦</div>
+        <div style="padding:24px;text-align:center;color:var(--t2);font-size:13px">Loading conversations…</div>
       </div>
     </div>
   </div>
@@ -61,16 +61,16 @@
 <div class="dm-overlay" id="dm-overlay"></div>
 <aside class="dm-drawer" id="dm-drawer">
   <div class="dm-head">
-    <div class="member-av" id="dm-av">â€“</div>
+    <div class="member-av" id="dm-av">–</div>
     <div style="flex:1;min-width:0">
-      <div id="dm-name" style="font-weight:800;font-size:14px">â€”</div>
-      <div id="dm-role" style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px">â€”</div>
+      <div id="dm-name" style="font-weight:800;font-size:14px">—</div>
+      <div id="dm-role" style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px">—</div>
     </div>
-    <button class="form-close" id="dm-close">âœ•</button>
+    <button class="form-close" id="dm-close">✕</button>
   </div>
   <div class="dm-msgs" id="dm-msgs"></div>
   <div class="dm-input-row">
-    <input id="dm-input" class="form-input" type="text" placeholder="Type a messageâ€¦"
+    <input id="dm-input" class="form-input" type="text" placeholder="Type a message…"
       style="flex:1;padding:9px 12px;font-size:13px" autocomplete="off">
     <button id="dm-send" class="btn-accent" style="padding:9px 16px">Send</button>
   </div>
@@ -105,7 +105,7 @@
   const convSearch = document.getElementById('conv-search');
   const inboxSub  = document.getElementById('inbox-sub');
 
-  // â”€â”€ Load conversations + directory in parallel â”€â”€
+  // ── Load conversations + directory in parallel ──
   const [convs, dir] = await Promise.all([
     loadConversations(meEmail),
     loadDirectory(),
@@ -128,7 +128,7 @@
 
     if (!filtered.length) {
       convList.innerHTML = `<div style="padding:24px;text-align:center;color:var(--t2);font-size:13px">${
-        filter ? 'No conversations match your search.' : 'No messages yet â€” start a conversation from the Community page.'
+        filter ? 'No conversations match your search.' : 'No messages yet — start a conversation from the Community page.'
       }</div>`;
       return;
     }
@@ -141,7 +141,7 @@
       const avHtml = avUrl
         ? `<div class="member-av" style="padding:0;overflow:hidden"><img src="${avUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>`
         : `<div class="member-av">${initials(name)}</div>`;
-      const preview = (lastMsg.body || '').slice(0, 60) + (lastMsg.body && lastMsg.body.length > 60 ? 'â€¦' : '');
+      const preview = (lastMsg.body || '').slice(0, 60) + (lastMsg.body && lastMsg.body.length > 60 ? '…' : '');
       const mine = (lastMsg.sender_email || '').toLowerCase() === meEmail.toLowerCase();
       return `
         <div class="conv-row" data-email="${esc(otherEmail)}" data-name="${esc(name)}" data-role="${esc(role)}">
@@ -171,7 +171,7 @@
     });
   }
 
-  // â”€â”€ DM drawer â”€â”€
+  // ── DM drawer ──
   let _dmOther = null, _dmPoll = null;
   const dmOverlay = document.getElementById('dm-overlay');
   const dmDrawer  = document.getElementById('dm-drawer');
@@ -185,7 +185,7 @@
       const mine = (m.sender_email || '').toLowerCase() === meEmail.toLowerCase();
       const t = new Date(m.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       return `<div class="dm-bubble ${mine ? 'me' : 'them'}">${esc(m.body)}<span class="dm-time">${t}</span></div>`;
-    }).join('') : '<div style="color:var(--t2);font-size:12px;text-align:center;margin:auto">No messages yet â€” say hi ðŸ‘‹</div>';
+    }).join('') : '<div style="color:var(--t2);font-size:12px;text-align:center;margin:auto">No messages yet — say hi 👋</div>';
     if (scroll) dmMsgs.scrollTop = dmMsgs.scrollHeight;
   }
 
