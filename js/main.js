@@ -582,6 +582,49 @@ function injectNotifications() {
   refreshNotifications();
 }
 
+/* ════════════════════════════════════
+   MOBILE NAV — turn the hover sidebar into an
+   off-canvas drawer with a hamburger toggle + backdrop.
+   Injected globally so no per-page HTML edits are needed.
+   ════════════════════════════════════ */
+function injectMobileNav() {
+  const sidebar = document.querySelector('.sidebar');
+  const topbar  = document.querySelector('.topbar');
+  if (!sidebar || !topbar || document.querySelector('.mobile-nav-toggle')) return;
+
+  // Hamburger button — lives at the front of the topbar, shown only on mobile via CSS.
+  const toggle = document.createElement('button');
+  toggle.className = 'mobile-nav-toggle';
+  toggle.setAttribute('aria-label', 'Open menu');
+  toggle.innerHTML =
+    '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' +
+    '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/>' +
+    '<line x1="3" y1="18" x2="21" y2="18"/></svg>';
+  topbar.insertBefore(toggle, topbar.firstChild);
+
+  // Dim backdrop behind the open drawer.
+  const backdrop = document.createElement('div');
+  backdrop.className = 'mobile-nav-backdrop';
+  document.body.appendChild(backdrop);
+
+  const open  = () => { document.body.classList.add('mobile-nav-open');  toggle.setAttribute('aria-label', 'Close menu'); };
+  const close = () => { document.body.classList.remove('mobile-nav-open'); toggle.setAttribute('aria-label', 'Open menu'); };
+  window._apexCloseMobileNav = close;
+
+  toggle.addEventListener('click', () =>
+    document.body.classList.contains('mobile-nav-open') ? close() : open());
+  backdrop.addEventListener('click', close);
+
+  // Tapping any nav item (drawer link) or sidebar action closes the drawer.
+  sidebar.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-item, .sb-link, .btn-start')) close();
+  });
+
+  // Close on Escape, and whenever we grow back to desktop width.
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  window.matchMedia('(min-width: 769px)').addEventListener('change', (e) => { if (e.matches) close(); });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Render all icons ── */
@@ -595,6 +638,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Inbox FAB ── */
   injectInboxFab();
+
+  /* ── Mobile drawer nav ── */
+  injectMobileNav();
 
   /* ── Topbar member search ── */
   initMemberSearch();
@@ -716,22 +762,52 @@ document.addEventListener('DOMContentLoaded', () => {
 const _reduceMotion = () =>
   window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-window.toast = function (msg, type = '', ms = 2600) {
+window.toast = function (msg, type = '', ms = 5000) {
   let wrap = document.querySelector('.apex-toasts');
   if (!wrap) {
     wrap = document.createElement('div');
     wrap.className = 'apex-toasts';
     document.body.appendChild(wrap);
   }
+
   const t = document.createElement('div');
   t.className = 'apex-toast ' + type;
-  t.textContent = msg;
+
+  const text = document.createElement('span');
+  text.className = 'apex-toast-msg';
+  text.textContent = msg;
+
+  const close = document.createElement('button');
+  close.className = 'apex-toast-close';
+  close.setAttribute('aria-label', 'Dismiss');
+  close.innerHTML = '&times;';
+
+  const bar = document.createElement('div');
+  bar.className = 'apex-toast-bar';
+  bar.style.animationDuration = ms + 'ms';
+
+  t.append(text, close, bar);
   wrap.appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => {
+
+  let timer;
+  const dismiss = () => {
+    if (t._gone) return;
+    t._gone = true;
+    clearTimeout(timer);
     t.classList.remove('show');
     setTimeout(() => t.remove(), 450);
-  }, ms);
+  };
+  const start = () => { timer = setTimeout(dismiss, ms); };
+
+  // Tap anywhere / the ✕ to dismiss; pause the countdown while hovered (desktop).
+  close.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });
+  t.addEventListener('click', dismiss);
+  t.addEventListener('mouseenter', () => { clearTimeout(timer); bar.style.animationPlayState = 'paused'; });
+  t.addEventListener('mouseleave', () => { bar.style.animationPlayState = 'running'; start(); });
+
+  start();
+  return dismiss;
 };
 
 window.celebrate = function (x, y) {

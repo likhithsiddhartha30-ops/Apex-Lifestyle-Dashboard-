@@ -1445,20 +1445,56 @@ input[type="checkbox"]:active { transform: scale(1.25); }
 /* ── Toasts ── */
 .apex-toasts {
   position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+  display: flex; flex-direction: column; gap: 10px;
+  max-width: min(360px, calc(100vw - 32px));
 }
 .apex-toast {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 10px;
   background: var(--card); border: 1px solid var(--border);
-  border-left: 3px solid var(--accent); border-radius: 10px;
-  padding: 12px 16px; min-width: 190px; max-width: 320px;
+  border-left: 3px solid var(--accent); border-radius: 12px;
+  padding: 13px 14px 13px 16px; min-width: 190px;
   color: var(--t1); font-size: 13px; font-weight: 700; letter-spacing: .3px;
   box-shadow: 0 14px 44px rgba(0,0,0,0.5);
-  transform: translateX(130%); opacity: 0;
+  transform: translateX(130%); opacity: 0; cursor: pointer;
   transition: transform .4s cubic-bezier(.2,.8,.2,1), opacity .4s;
 }
 .apex-toast.show  { transform: translateX(0); opacity: 1; }
 .apex-toast.success { border-left-color: var(--green); }
 .apex-toast.error   { border-left-color: var(--red); }
+.apex-toast-msg { flex: 1; line-height: 1.35; }
+.apex-toast-close {
+  flex-shrink: 0; width: 22px; height: 22px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: 6px;
+  color: var(--t2); font-size: 20px; line-height: 1; cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.apex-toast-close:hover { background: rgba(255,255,255,0.08); color: var(--t1); }
+.apex-toast-bar {
+  position: absolute; left: 0; bottom: 0; height: 3px; width: 100%;
+  transform-origin: left; background: var(--accent);
+  animation: apexToastBar linear forwards;
+}
+.apex-toast.success .apex-toast-bar { background: var(--green); }
+.apex-toast.error   .apex-toast-bar { background: var(--red); }
+@keyframes apexToastBar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .apex-toast-bar { animation: none; } }
+
+/* Mobile: full-width toasts that rise from the bottom, above the nav */
+@media (max-width: 640px) {
+  .apex-toasts {
+    left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
+    max-width: none; align-items: stretch;
+  }
+  .apex-toast {
+    min-width: 0; padding: 15px 14px 15px 16px; font-size: 14px;
+    border-radius: 14px;
+    transform: translateY(140%);
+  }
+  .apex-toast.show { transform: translateY(0); }
+  .apex-toast-close { width: 28px; height: 28px; font-size: 22px; }
+}
 
 /* ── Confetti ── */
 .confetti-piece {
@@ -1557,4 +1593,113 @@ input[type="checkbox"]:active { transform: scale(1.25); }
     animation-iteration-count: 1 !important;
     transition-duration: .001ms !important;
   }
+}
+
+/* ════════════════════════════════════
+   MOBILE — off-canvas drawer nav + single-column layouts
+   Injected hamburger/backdrop are hidden on desktop.
+   ════════════════════════════════════ */
+.mobile-nav-toggle,
+.mobile-nav-backdrop { display: none; }
+
+@media (max-width: 768px) {
+  /* ── Sidebar becomes an off-canvas drawer ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    transform: translateX(-100%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    box-shadow: none;
+    z-index: 120;
+  }
+  /* Touch devices have no real hover — neutralise the hover-expand entirely */
+  .sidebar:hover { width: var(--sidebar-w); box-shadow: none; }
+  body.mobile-nav-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0,0,0,.5);
+  }
+
+  /* Undo the collapsed icon-rail rules so the drawer always shows full nav */
+  .sidebar:not(:hover) .sb-brand-text { font-size: 18px; letter-spacing: 2px; }
+  .sidebar:not(:hover) .sb-brand-text::before { content: none; }
+  .sidebar:not(:hover) .sb-brand-img { max-width: 180px; margin: 0; }
+  .sidebar:not(:hover) .sb-brand { padding: 0 18px 18px; }
+  .sidebar:not(:hover) .sb-user  { padding: 0 18px 16px; }
+  .sidebar:not(:hover) .sb-uname,
+  .sidebar:not(:hover) .sb-umode,
+  .sidebar:not(:hover) .sb-client-label,
+  .sidebar:not(:hover) .client-select,
+  .sidebar:not(:hover) .sb-links { display: block; }
+  .sidebar:not(:hover) .sb-nav { padding: 0 10px; }
+  .sidebar:not(:hover) .nav-item {
+    justify-content: flex-start; gap: 10px; font-size: 11px;
+    padding: 9px 12px; border-left-width: 3px;
+  }
+  .sidebar:not(:hover) .nav-icon { font-size: 14px; width: 18px; }
+
+  /* Main content no longer needs to clear a fixed rail */
+  .main { padding-left: 0; }
+
+  /* ── Hamburger toggle (front of topbar) ── */
+  .mobile-nav-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; flex-shrink: 0; padding: 0;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); color: var(--t1);
+  }
+  .mobile-nav-toggle .icon { width: 20px; height: 20px; }
+
+  /* ── Backdrop behind the open drawer ── */
+  .mobile-nav-backdrop {
+    display: block; position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    z-index: 110; opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  body.mobile-nav-open .mobile-nav-backdrop { opacity: 1; pointer-events: auto; }
+
+  /* ── Topbar tightening ── */
+  .topbar { padding: 0 12px; gap: 10px; }
+  .topbar .search { display: none; }
+  .topbar-logo { height: 28px; }
+  .tb-right { gap: 8px; }
+
+  /* ── Content padding ── */
+  .page-content { padding: 18px 14px; }
+
+  /* ── Collapse multi-column grids to one column ── */
+  .dash-main, .dash-bottom, .train-grid, .nut-grid, .bio-grid,
+  .recov-grid, .comm-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Macros stay 3-up, progress photos stay 2-up — just tighter gaps */
+  .micro-grid  { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .photos-grid { gap: 8px; }
+
+  /* Inline page grids (community feed+rail, profile) — override the inline style */
+  [style*="grid-template-columns:1fr 320px"],
+  [style*="grid-template-columns:1fr 300px"],
+  [style*="grid-template-columns: 1fr 320px"],
+  [style*="grid-template-columns: 1fr 300px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Scale down oversized display numbers so they never overflow a card */
+  .pg-title    { font-size: 28px; margin-bottom: 16px; }
+  .dash-welcome{ font-size: 30px; }
+  .wk-title    { font-size: 26px; }
+  .cal-num     { font-size: 38px; }
+  .metric-val  { font-size: 32px; }
+  .recov-val   { font-size: 30px; }
+  .astat-num   { font-size: 30px; }
+  .val-xl      { font-size: 34px; }
+  .val-lg      { font-size: 28px; }
+
+  /* Stacked page header */
+  .dash-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  /* Admin table → stacked rows (drop the fixed 5-col template) */
+  .admin-table-head { display: none; }
+  .admin-row { grid-template-columns: 1fr; gap: 6px; padding: 14px 16px; }
+
+  /* Slide-in panels / drawers span the screen */
+  .dm-drawer  { width: 100%; max-width: 100%; }
+  .form-panel { width: 100%; max-width: 100%; padding: 24px 18px; }
 }
