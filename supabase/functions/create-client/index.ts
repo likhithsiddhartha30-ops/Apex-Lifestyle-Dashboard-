@@ -18,7 +18,11 @@ serve(async (req: Request) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    const { type, name, email, password, goal, start_date, specialty, joined_date } = await req.json();
+    const body = await req.json();
+    const { type, name, password, goal, start_date, specialty, joined_date } = body;
+    // Normalise email to lowercase so the stored row matches the auth account
+    // (Supabase Auth lowercases emails), keeping role detection reliable.
+    const email = (body.email || "").trim().toLowerCase();
 
     // ── Reset password for an existing user ──────────────────────────────────
     if (type === "reset-password") {

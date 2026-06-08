@@ -21,6 +21,13 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 const getClientId = ()   => localStorage.getItem('apex_cid');
 const setClientId = (id) => localStorage.setItem('apex_cid', String(id));
 
+// Supabase Auth normalises emails to lowercase, but the clients/coaches tables
+// store them exactly as typed. Look these up case-insensitively so a client whose
+// email was entered with capitals (e.g. "Name@gmail.com") still resolves to their
+// row instead of falling through to the admin portal. Escapes LIKE wildcards so
+// any '%' or '_' inside an address is matched literally.
+const emailPattern = (email) => String(email || '').replace(/([\\%_])/g, '\\$1');
+
 async function loadClients() {
   try {
     const { data, error } = await db.from('clients').select('*').order('name');
@@ -500,9 +507,9 @@ async function loadConversations(email) {
 
 async function saveUserAvatar(email, avatarUrl) {
   try {
-    const { data: coach } = await db.from('coaches').select('id').eq('email', email).maybeSingle();
+    const { data: coach } = await db.from('coaches').select('id').ilike('email', emailPattern(email)).maybeSingle();
     if (coach) { await db.from('coaches').update({ avatar_url: avatarUrl }).eq('id', coach.id); return; }
-    const { data: client } = await db.from('clients').select('id').eq('email', email).maybeSingle();
+    const { data: client } = await db.from('clients').select('id').ilike('email', emailPattern(email)).maybeSingle();
     if (client) { await db.from('clients').update({ avatar_url: avatarUrl }).eq('id', client.id); }
   } catch (e) {
     console.warn('[Supabase] saveUserAvatar:', e.message);
@@ -752,9 +759,9 @@ function apexCurrentPage() {
 // Determine which portal an authenticated user belongs to + their home page.
 async function getUserPortal(email) {
   try {
-    const { data: coach } = await db.from('coaches').select('id').eq('email', email).maybeSingle();
+    const { data: coach } = await db.from('coaches').select('id').ilike('email', emailPattern(email)).maybeSingle();
     if (coach) return 'coach';
-    const { data: client } = await db.from('clients').select('id').eq('email', email).maybeSingle();
+    const { data: client } = await db.from('clients').select('id').ilike('email', emailPattern(email)).maybeSingle();
     if (client) return 'client';
   } catch (_) {}
   return 'admin'; // owner / no coach|client row
@@ -836,7 +843,7 @@ async function initSidebar() {
   }
 
   // Detect role: check if email belongs to a coach or client
-  const { data: coachRow } = await db.from('coaches').select('id').eq('email', user.email).maybeSingle();
+  const { data: coachRow } = await db.from('coaches').select('id').ilike('email', emailPattern(user.email)).maybeSingle();
 
   if (coachRow) {
     // ── Coach ──────────────────────────────────────────────────────────────
@@ -873,7 +880,7 @@ async function initSidebar() {
     });
 
   } else {
-    const { data: clientRow } = await db.from('clients').select('id').eq('email', user.email).maybeSingle();
+    const { data: clientRow } = await db.from('clients').select('id').ilike('email', emailPattern(user.email)).maybeSingle();
 
     if (!clientRow) {
       // ── Admin (owner) ───────────────────────────────────────────────────
