@@ -55,8 +55,10 @@
     <div class="pg-title" style="margin-bottom:8px">How Was Your Week?</div>
 
     <div class="ci-intro">
-      <p>Fill this out honestly every week. Your coach reviews all responses. Takes 3–5 minutes.</p>
+      <p>Fill this out honestly every Monday. Your coach reviews all responses. Takes 3–5 minutes.</p>
     </div>
+
+    <div id="ci-status" class="ci-status" style="display:none"></div>
 
     <form class="ci-form" id="ci-form" autocomplete="off">
 
@@ -69,8 +71,9 @@
       </div>
 
       <div class="ci-q">
-        <div class="ci-q-label">Today's Check-In Date <span class="ci-req">*</span></div>
-        <input class="form-input" id="f-date" type="date">
+        <div class="ci-q-label">This Week's Check-In (Monday) <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Locked to the current week — check-ins are done every Monday.</div>
+        <input class="form-input" id="f-date" type="date" readonly>
       </div>
 
       <!-- ── MENTAL & STRESS ── -->
@@ -240,9 +243,7 @@
     if (btn) { btn.classList.add('active'); seg.dataset.value = String(val); }
   };
 
-  // ── Prefill name (from auth) + date (today IST) ──
-  const today = getTodayIST();
-  $('#f-date').value = today;
+  // ── Prefill name (from auth) ──
   try {
     const { data: { user } } = await db.auth.getUser();
     const m = (user && user.user_metadata) || {};
@@ -251,40 +252,86 @@
     if (nm && !$('#f-name').value) $('#f-name').value = nm;
   } catch (_) {}
 
-  // If a check-in already exists for the chosen date, load it so edits update it
-  async function prefillForDate(date) {
-    try {
-      const rows = await loadWeeklyCheckIns(cid, 26);
-      const row = rows.find(r => r.date === date);
-      if (!row) return;
-      if (row.full_name)   $('#f-name').value = row.full_name;
-      if (row.week_overall)$('#f-overall').value = row.week_overall;
-      if (row.train_days != null) $('#f-train-days').value = row.train_days;
-      if (row.train_note)  $('#f-train-note').value = row.train_note;
-      if (row.missed_diet_note) $('#f-diet-note').value = row.missed_diet_note;
-      setSeg('feeling', row.feeling);
-      setSeg('stress', row.stress);
-      setSeg('missed_diet', row.missed_diet);
-      setSeg('steps_done', row.steps_done);
-      setSeg('energy_crash', row.energy_crash);
-      setSeg('strength_up', row.strength_up);
-      setSeg('photo_shared', row.photo_shared);
-      if (row.missed_diet === 'Yes') { const n = $('#f-diet-note'); if (n) n.style.display = 'block'; }
-      const days = { mon:'weight_mon',tue:'weight_tue',wed:'weight_wed',thu:'weight_thu',fri:'weight_fri',sat:'weight_sat',sun:'weight_sun' };
-      Object.entries(days).forEach(([d, col]) => {
-        const inp = document.querySelector(`input[data-day="${d}"]`);
-        if (inp && row[col] != null) inp.value = row[col];
-      });
-    } catch (_) {}
+  // ── Weekly cadence — check-ins are done on Monday, once per week ──
+  // Every entry is anchored to its week's Monday date, so "once a week" is just
+  // "one row per Monday". The form only opens on Monday and locks after submit.
+  const pad = (n) => String(n).padStart(2, '0');
+  const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const weekMonday = (offsetWeeks = 0) => {
+    const d = getNowIST();
+    const day = d.getDay();                                   // 0=Sun … 6=Sat
+    d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day) + offsetWeeks * 7);
+    return ymd(d);
+  };
+  const prettyMon  = (s) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  const isMonday   = getNowIST().getDay() === 1;
+  const thisMonday = weekMonday(0);
+  const nextMonday = weekMonday(1);
+
+  // Anchor the entry to this week's Monday (the field is read-only)
+  $('#f-date').value = thisMonday;
+
+  function fillForm(row) {
+    if (!row) return;
+    if (row.full_name)    $('#f-name').value    = row.full_name;
+    if (row.week_overall) $('#f-overall').value = row.week_overall;
+    if (row.train_days != null) $('#f-train-days').value = row.train_days;
+    if (row.train_note)   $('#f-train-note').value = row.train_note;
+    if (row.missed_diet_note) $('#f-diet-note').value = row.missed_diet_note;
+    setSeg('feeling', row.feeling);       setSeg('stress', row.stress);
+    setSeg('missed_diet', row.missed_diet); setSeg('steps_done', row.steps_done);
+    setSeg('energy_crash', row.energy_crash); setSeg('strength_up', row.strength_up);
+    setSeg('photo_shared', row.photo_shared);
+    if (row.missed_diet === 'Yes') { const n = $('#f-diet-note'); if (n) n.style.display = 'block'; }
+    const days = { mon:'weight_mon',tue:'weight_tue',wed:'weight_wed',thu:'weight_thu',fri:'weight_fri',sat:'weight_sat',sun:'weight_sun' };
+    Object.entries(days).forEach(([d, col]) => {
+      const inp = document.querySelector(`input[data-day="${d}"]`);
+      if (inp && row[col] != null) inp.value = row[col];
+    });
   }
-  await prefillForDate(today);
-  $('#f-date').addEventListener('change', () => prefillForDate($('#f-date').value));
+
+  function setStatus(kind, title, sub) {
+    const el = $('#ci-status');
+    el.className = 'ci-status ' + kind;
+    el.style.display = 'flex';
+    el.innerHTML = `<div class="ci-status-ico">${kind === 'done' ? '✅' : '🔒'}</div>` +
+                   `<div class="ci-status-txt"><b>${title}</b><span>${sub}</span></div>`;
+  }
+  function lockForm() {
+    $('#ci-form').classList.add('locked');
+    const btn = $('#ci-submit');
+    if (btn) { btn.disabled = true; btn.textContent = 'Check-In Locked'; }
+  }
+
+  // Has this week's check-in already been done? (one row per Monday)
+  const existingRows = await loadWeeklyCheckIns(cid, 26);
+  const thisWeekRow  = existingRows.find(r => r.date === thisMonday);
+
+  if (thisWeekRow) {
+    fillForm(thisWeekRow);
+    lockForm();
+    setStatus('done', 'This week\'s check-in is complete',
+      `Submitted for the week of ${prettyMon(thisMonday)}. Your next check-in opens ${prettyMon(nextMonday)}.`);
+  } else if (!isMonday) {
+    lockForm();
+    setStatus('closed', 'Check-ins open every Monday',
+      `Your weekly check-in isn't open right now — come back on ${prettyMon(nextMonday)} to fill it out.`);
+  }
+  // else: it's Monday and not yet submitted → the form stays open
 
   // ── Submit ──
   $('#ci-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Weekly gate: only on Monday, and never twice in the same week.
+    if ($('#ci-form').classList.contains('locked')) return;
+    if (!isMonday) {
+      if (window.toast) window.toast('Check-ins can only be submitted on Mondays', 'error');
+      return;
+    }
+
     const name = $('#f-name').value.trim();
-    const date = $('#f-date').value;
+    const date = thisMonday;
     const overall = $('#f-overall').value.trim();
 
     // Required fields
@@ -334,11 +381,17 @@
       await saveWeeklyCheckIn(cid, date, payload);
       if (window.celebrate) window.celebrate();
       if (window.toast) window.toast('Check-in submitted — your coach will see it 💪', 'success');
+      lockForm();
+      setStatus('done', 'This week\'s check-in is complete',
+        `Submitted for the week of ${prettyMon(thisMonday)}. Your next check-in opens ${prettyMon(nextMonday)}.`);
       await renderHistory();
     } catch (_) {
       if (window.toast) window.toast('Could not save — please try again', 'error');
     } finally {
-      btn.disabled = false; btn.textContent = 'Submit Check-In';
+      // Leave the button as "Check-In Locked" once a submission has succeeded.
+      if (!$('#ci-form').classList.contains('locked')) {
+        btn.disabled = false; btn.textContent = 'Submit Check-In';
+      }
     }
   });
 

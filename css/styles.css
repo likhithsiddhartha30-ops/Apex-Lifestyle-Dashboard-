@@ -1490,6 +1490,18 @@ input[type="checkbox"]:active { transform: scale(1.25); }
 }
 .ci-intro p { font-size: 13px; color: var(--t2); line-height: 1.6; }
 .ci-form { max-width: 720px; }
+.ci-form.locked { opacity: 0.6; pointer-events: none; }
+
+/* Weekly gate banner (locked / completed) */
+.ci-status {
+  display: flex; gap: 12px; align-items: flex-start; max-width: 720px;
+  border: 1px solid var(--border2); background: var(--bg2);
+  border-radius: var(--r); padding: 16px 18px; margin-bottom: 20px;
+}
+.ci-status.done { border-color: var(--green); background: var(--green-dim); }
+.ci-status-ico { font-size: 20px; line-height: 1.2; flex-shrink: 0; }
+.ci-status-txt b { display: block; font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+.ci-status-txt span { font-size: 12px; color: var(--t2); line-height: 1.5; }
 .ci-section-title {
   font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 800;
   text-transform: uppercase; letter-spacing: 2px; color: var(--accent);
