@@ -202,6 +202,54 @@ async function saveCheckIn(clientId, date, payload) {
   }
 }
 
+// ── Weekly check-ins ("How Was Your Week?" survey) ──────────
+// A client's own weekly submissions, newest first.
+async function loadWeeklyCheckIns(clientId, limit = 26) {
+  try {
+    const { data, error } = await db.from('weekly_checkins')
+      .select('*').eq('client_id', clientId)
+      .order('date', { ascending: false }).limit(limit);
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[Supabase] loadWeeklyCheckIns:', e.message);
+    return [];
+  }
+}
+
+// Every client's submissions (coach / admin review). Joins the client name.
+async function loadAllWeeklyCheckIns(limit = 300) {
+  try {
+    const { data, error } = await db.from('weekly_checkins')
+      .select('*, clients(name)')
+      .order('date', { ascending: false }).limit(limit);
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[Supabase] loadAllWeeklyCheckIns:', e.message);
+    return [];
+  }
+}
+
+// Save (or update) a weekly check-in. One row per client per date.
+async function saveWeeklyCheckIn(clientId, date, payload) {
+  try {
+    const { data: existing } = await db.from('weekly_checkins')
+      .select('id').eq('client_id', clientId).eq('date', date).limit(1);
+    if (existing && existing.length) {
+      const { error } = await db.from('weekly_checkins').update(payload).eq('id', existing[0].id);
+      if (error) throw error;
+    } else {
+      const { error } = await db.from('weekly_checkins')
+        .insert({ client_id: clientId, date, ...payload });
+      if (error) throw error;
+    }
+  } catch (e) {
+    console.warn('[Supabase] saveWeeklyCheckIn:', e.message);
+    throw e;
+  }
+}
+
 async function loadCoaches() {
   try {
     const { data, error } = await db.from('coaches').select('*').order('name');
@@ -661,6 +709,7 @@ const APEX_PORTAL = {
       { page: 'admin-training.html',   label: 'Training',   icon: 'zap' },
       { page: 'admin-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'admin-biometrics.html', label: 'Biometrics', icon: 'trending' },
+      { page: 'admin-checkins.html',   label: 'Check-Ins',  icon: 'clipboard' },
       { page: 'admin-community.html',    label: 'Community',    icon: 'users' },
       { page: 'admin-form-videos.html', label: 'Form Videos',  icon: 'play' },
       { page: 'admin-inbox.html',       label: 'Inbox',        icon: 'message' },
@@ -674,6 +723,7 @@ const APEX_PORTAL = {
       { page: 'coach-training.html',   label: 'Training',   icon: 'zap' },
       { page: 'coach-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'coach-biometrics.html', label: 'Biometrics', icon: 'trending' },
+      { page: 'coach-checkins.html',   label: 'Check-Ins',  icon: 'clipboard' },
       { page: 'coach-community.html',    label: 'Community',    icon: 'users' },
       { page: 'coach-form-videos.html', label: 'Form Videos',  icon: 'play' },
       { page: 'coach-inbox.html',       label: 'Inbox',        icon: 'message' },
@@ -686,6 +736,7 @@ const APEX_PORTAL = {
       { page: 'client-training.html',   label: 'Training',   icon: 'zap' },
       { page: 'client-nutrition.html',  label: 'Nutrition',  icon: 'utensils' },
       { page: 'client-biometrics.html', label: 'Biometrics', icon: 'trending' },
+      { page: 'client-checkins.html',   label: 'Check-Ins',  icon: 'clipboard' },
       { page: 'client-community.html',    label: 'Community',    icon: 'users' },
       { page: 'client-form-videos.html', label: 'Form Videos',  icon: 'play' },
       { page: 'client-inbox.html',       label: 'Inbox',        icon: 'message' },

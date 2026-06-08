@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="images/logo.ico">
+<title>ApexLifestyle — Check-In Reviews</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><img class="sb-brand-img" src="images/logo.png" alt="ApexLifestyle"></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Admin</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <img class="topbar-logo" src="images/logo.png" alt="ApexLifestyle">
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <div class="pg-eyebrow">Weekly Review</div>
+    <div class="pg-title" style="margin-bottom:8px">Check-In Reviews</div>
+    <div class="pg-sub" style="margin-top:0">Every client's weekly responses — newest first. Tap a card to expand.</div>
+
+    <div class="ci-review-bar">
+      <input class="form-input" id="ci-filter-name" type="text" placeholder="Filter by client name…">
+      <select class="form-input" id="ci-filter-scope" style="max-width:200px">
+        <option value="all">All clients</option>
+        <option value="selected">Selected client only</option>
+      </select>
+    </div>
+
+    <div id="ci-list"><div class="ci-empty">Loading…</div></div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+
+  const $ = (s) => document.querySelector(s);
+  const esc = (t) => (t || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const initials = (n) => (n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+  let all = await loadAllWeeklyCheckIns(400);
+
+  function clientName(r) {
+    return (r.clients && r.clients.name) || r.full_name || 'Client';
+  }
+
+  function renderAnswers(r) {
+    const cell = (label, val, cls = '') => val == null || val === '' ? '' :
+      `<div class="${cls}"><div class="ci-ans-label">${label}</div><div class="ci-ans-val${cls.includes('full') ? ' free' : ''}">${esc(String(val))}</div></div>`;
+    const days = [['Mon',r.weight_mon],['Tue',r.weight_tue],['Wed',r.weight_wed],['Thu',r.weight_thu],['Fri',r.weight_fri],['Sat',r.weight_sat],['Sun',r.weight_sun]];
+    const wPills = days.filter(([,v]) => v != null)
+      .map(([d,v]) => `<div class="ci-weight-pill"><span>${d}</span>${parseFloat(v)}kg</div>`).join('');
+    return `<div class="ci-ans-grid">
+      ${cell('Overall', r.week_overall, 'ci-ans-full')}
+      ${cell('Feeling', r.feeling)}
+      ${cell('Stress', r.stress != null ? r.stress + '/10' : '')}
+      ${cell('Missed diet', r.missed_diet)}
+      ${cell('Steps target', r.steps_done)}
+      ${cell('Energy crash', r.energy_crash)}
+      ${cell('Strength up', r.strength_up)}
+      ${cell('Days trained', r.train_days)}
+      ${cell('Progress photo', r.photo_shared)}
+      ${r.missed_diet_note ? cell('Diet notes', r.missed_diet_note, 'ci-ans-full') : ''}
+      ${r.train_note ? cell('Training notes', r.train_note, 'ci-ans-full') : ''}
+      ${wPills ? `<div class="ci-ans-full"><div class="ci-ans-label">Daily Weights</div><div class="ci-weights-row">${wPills}</div></div>` : ''}
+    </div>`;
+  }
+
+  function tags(r) {
+    let out = '';
+    if (r.stress != null)
+      out += `<span class="ci-tag ${r.stress >= 7 ? 'bad' : (r.stress <= 3 ? 'good' : 'neutral')}">Stress ${r.stress}/10</span>`;
+    if (r.strength_up)
+      out += `<span class="ci-tag ${r.strength_up === 'Yes' ? 'good' : (r.strength_up === 'No' ? 'bad' : 'neutral')}">Strength ${esc(r.strength_up)}</span>`;
+    if (r.missed_diet === 'Yes') out += `<span class="ci-tag bad">Missed diet</span>`;
+    if (r.energy_crash === 'Yes') out += `<span class="ci-tag bad">Energy crash</span>`;
+    return out;
+  }
+
+  function render() {
+    const q = $('#ci-filter-name').value.trim().toLowerCase();
+    const scope = $('#ci-filter-scope').value;
+    const cid = getClientId();
+
+    let rows = all.slice();
+    if (scope === 'selected' && cid) rows = rows.filter(r => String(r.client_id) === String(cid));
+    if (q) rows = rows.filter(r => clientName(r).toLowerCase().includes(q));
+
+    const wrap = $('#ci-list');
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="ci-empty">No check-ins found.</div>';
+      return;
+    }
+    wrap.innerHTML = rows.map(r => `
+      <div class="ci-card" data-id="${r.id}">
+        <div class="ci-card-head">
+          <div class="ci-card-av">${initials(clientName(r))}</div>
+          <div class="ci-card-id">
+            <div class="ci-card-name">${esc(clientName(r))}</div>
+            <div class="ci-card-date">${fmtDate(r.date)}${r.feeling ? ' · ' + esc(r.feeling) : ''}</div>
+          </div>
+          <div class="ci-card-tags">${tags(r)}</div>
+          <span class="ci-card-caret">${window.icon ? window.icon('trending') : '▾'}</span>
+        </div>
+        <div class="ci-card-body">${renderAnswers(r)}</div>
+      </div>`).join('');
+    wrap.querySelectorAll('.ci-card-head').forEach(h => {
+      h.addEventListener('click', () => h.closest('.ci-card').classList.toggle('open'));
+    });
+  }
+
+  $('#ci-filter-name').addEventListener('input', render);
+  $('#ci-filter-scope').addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>

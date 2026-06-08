@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="images/logo.ico">
+<title>ApexLifestyle — Weekly Check-In</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><img class="sb-brand-img" src="images/logo.png" alt="ApexLifestyle"></div>
+  <div class="sb-user">
+    <div class="sb-uname" id="sb-admin-name">—</div>
+    <div class="sb-umode" id="sb-admin-role">Client</div>
+    <div class="sb-client-label">Viewing Client</div>
+    <select id="client-select" class="client-select">
+      <option value="">Select client…</option>
+    </select>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item" href="index.html"      data-page="index.html"><span class="nav-icon">⊞</span>Dashboard</a>
+    <a class="nav-item" href="training.html"   data-page="training.html"><span class="nav-icon">⚡</span>Training</a>
+    <a class="nav-item" href="nutrition.html"  data-page="nutrition.html"><span class="nav-icon">🍽</span>Nutrition</a>
+    <a class="nav-item" href="biometrics.html" data-page="biometrics.html"><span class="nav-icon">📈</span>Biometrics</a>
+    <a class="nav-item" href="community.html"  data-page="community.html"><span class="nav-icon">👥</span>Community</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-links">
+      <a class="sb-link" href="#">⓪ Support</a>
+      <a class="sb-link" href="#" onclick="signOut();return false;">⏻ Logout</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <img class="topbar-logo" src="images/logo.png" alt="ApexLifestyle">
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search...">
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">🧑</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <div class="pg-eyebrow">Weekly Review</div>
+    <div class="pg-title" style="margin-bottom:8px">How Was Your Week?</div>
+
+    <div class="ci-intro">
+      <p>Fill this out honestly every week. Your coach reviews all responses. Takes 3–5 minutes.</p>
+    </div>
+
+    <form class="ci-form" id="ci-form" autocomplete="off">
+
+      <!-- ── BASICS ── -->
+      <div class="ci-section-title">Basics</div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Your Full Name <span class="ci-req">*</span></div>
+        <input class="form-input" id="f-name" type="text" placeholder="Enter your name">
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Today's Check-In Date <span class="ci-req">*</span></div>
+        <input class="form-input" id="f-date" type="date">
+      </div>
+
+      <!-- ── MENTAL & STRESS ── -->
+      <div class="ci-section-title">Mental &amp; Stress</div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">How was your last week overall? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Be honest — the good, the bad, everything.</div>
+        <textarea class="form-input" id="f-overall" placeholder="Write freely here..."></textarea>
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">How are you feeling from inside? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Choose what best describes your inner state this week.</div>
+        <div class="ci-seg" data-field="feeling">
+          <button type="button" data-val="Great">😄 Great</button>
+          <button type="button" data-val="Good">🙂 Good</button>
+          <button type="button" data-val="Okay">😐 Okay</button>
+          <button type="button" data-val="Low">😕 Low</button>
+          <button type="button" data-val="Struggling">😣 Struggling</button>
+        </div>
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Rate your stress levels this week <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">1 = Super calm · 10 = Extremely stressed</div>
+        <div class="ci-seg ci-stress" data-field="stress">
+          <button type="button" data-val="1">1</button>
+          <button type="button" data-val="2">2</button>
+          <button type="button" data-val="3">3</button>
+          <button type="button" data-val="4">4</button>
+          <button type="button" data-val="5">5</button>
+          <button type="button" data-val="6">6</button>
+          <button type="button" data-val="7">7</button>
+          <button type="button" data-val="8">8</button>
+          <button type="button" data-val="9">9</button>
+          <button type="button" data-val="10">10</button>
+        </div>
+        <div class="ci-scale-ends"><span>Calm</span><span>Stressed</span></div>
+      </div>
+
+      <!-- ── DIET & LIFESTYLE ── -->
+      <div class="ci-section-title">Diet &amp; Lifestyle</div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Did you miss your diet on any day this week? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Include cheat meals or unplanned eating.</div>
+        <div class="ci-seg" data-field="missed_diet">
+          <button type="button" data-val="No">No</button>
+          <button type="button" data-val="Yes">Yes</button>
+        </div>
+        <textarea class="form-input" id="f-diet-note" placeholder="If yes, which days / what happened? (optional)" style="margin-top:10px;display:none"></textarea>
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Did you complete your daily step target? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Refer to the goal set by your coach.</div>
+        <div class="ci-seg" data-field="steps_done">
+          <button type="button" data-val="Yes">Yes</button>
+          <button type="button" data-val="No">No</button>
+          <button type="button" data-val="Some days">Some days</button>
+        </div>
+      </div>
+
+      <!-- ── TRAINING ── -->
+      <div class="ci-section-title">Training</div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Did you feel any energy crash during workouts? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Mid-session crash, sudden fatigue, lightheadedness, etc.</div>
+        <div class="ci-seg" data-field="energy_crash">
+          <button type="button" data-val="No">No</button>
+          <button type="button" data-val="Yes">Yes</button>
+        </div>
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Is your strength going up? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Compare to last week — weights, reps, sets.</div>
+        <div class="ci-seg" data-field="strength_up">
+          <button type="button" data-val="Yes">Yes</button>
+          <button type="button" data-val="Same">About the same</button>
+          <button type="button" data-val="No">No</button>
+        </div>
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">How many days did you train this week? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">If you missed any, mention which days and why below.</div>
+        <input class="form-input" id="f-train-days" type="number" min="0" max="7" inputmode="numeric" placeholder="e.g. 5" style="max-width:140px">
+        <textarea class="form-input" id="f-train-note" placeholder="Missed days & why (optional)" style="margin-top:10px"></textarea>
+      </div>
+
+      <!-- ── BODY STATS ── -->
+      <div class="ci-section-title">Body Stats</div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Daily empty stomach weight (Mon–Sun)</div>
+        <div class="ci-q-hint">Enter each day's morning weight in kg. Leave blank if not measured.</div>
+        <div class="ci-week-grid">
+          <div class="ci-day"><span class="ci-day-lbl">Mon</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="mon"><span class="ci-day-unit">kg</span></div></div>
+          <div class="ci-day"><span class="ci-day-lbl">Tue</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="tue"><span class="ci-day-unit">kg</span></div></div>
+          <div class="ci-day"><span class="ci-day-lbl">Wed</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="wed"><span class="ci-day-unit">kg</span></div></div>
+          <div class="ci-day"><span class="ci-day-lbl">Thu</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="thu"><span class="ci-day-unit">kg</span></div></div>
+          <div class="ci-day"><span class="ci-day-lbl">Fri</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="fri"><span class="ci-day-unit">kg</span></div></div>
+          <div class="ci-day"><span class="ci-day-lbl">Sat</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="sat"><span class="ci-day-unit">kg</span></div></div>
+          <div class="ci-day"><span class="ci-day-lbl">Sun</span><div class="ci-day-input"><input class="form-input" type="number" step="0.1" inputmode="decimal" data-day="sun"><span class="ci-day-unit">kg</span></div></div>
+        </div>
+      </div>
+
+      <div class="ci-q">
+        <div class="ci-q-label">Did you share your Monday progress photo in the group? <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Send your Monday progress photo separately via WhatsApp to your coach.</div>
+        <div class="ci-seg" data-field="photo_shared">
+          <button type="button" data-val="Yes">Yes</button>
+          <button type="button" data-val="No">No</button>
+        </div>
+      </div>
+
+      <button class="btn-accent ci-submit" type="submit" id="ci-submit">Submit Check-In</button>
+    </form>
+
+    <!-- ── Past submissions ── -->
+    <div class="ci-section-title" style="margin-top:36px">Your Past Check-Ins</div>
+    <div id="ci-history"><div class="ci-empty">Loading…</div></div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/main.js"></script>
+<script>
+(window._apexPageInit = async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await initSidebar();
+  const cid = getClientId();
+  if (!cid) return;
+
+  const $ = (s) => document.querySelector(s);
+  const esc = (t) => (t || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+  // ── Segmented controls — single-select per group ──
+  document.querySelectorAll('.ci-seg').forEach(seg => {
+    seg.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      seg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      seg.dataset.value = btn.dataset.val;
+      // Reveal the diet note box only when "Yes" is chosen
+      if (seg.dataset.field === 'missed_diet') {
+        const note = $('#f-diet-note');
+        if (note) note.style.display = btn.dataset.val === 'Yes' ? 'block' : 'none';
+      }
+    });
+  });
+  const segVal = (field) => {
+    const seg = document.querySelector(`.ci-seg[data-field="${field}"]`);
+    return seg ? (seg.dataset.value || '') : '';
+  };
+  const setSeg = (field, val) => {
+    const seg = document.querySelector(`.ci-seg[data-field="${field}"]`);
+    if (!seg || val == null || val === '') return;
+    const btn = seg.querySelector(`button[data-val="${CSS.escape(String(val))}"]`);
+    if (btn) { btn.classList.add('active'); seg.dataset.value = String(val); }
+  };
+
+  // ── Prefill name (from auth) + date (today IST) ──
+  const today = getTodayIST();
+  $('#f-date').value = today;
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    const m = (user && user.user_metadata) || {};
+    const nm = m.full_name || m.display_name || m.name
+            || (user && user.email ? user.email.split('@')[0] : '');
+    if (nm && !$('#f-name').value) $('#f-name').value = nm;
+  } catch (_) {}
+
+  // If a check-in already exists for the chosen date, load it so edits update it
+  async function prefillForDate(date) {
+    try {
+      const rows = await loadWeeklyCheckIns(cid, 26);
+      const row = rows.find(r => r.date === date);
+      if (!row) return;
+      if (row.full_name)   $('#f-name').value = row.full_name;
+      if (row.week_overall)$('#f-overall').value = row.week_overall;
+      if (row.train_days != null) $('#f-train-days').value = row.train_days;
+      if (row.train_note)  $('#f-train-note').value = row.train_note;
+      if (row.missed_diet_note) $('#f-diet-note').value = row.missed_diet_note;
+      setSeg('feeling', row.feeling);
+      setSeg('stress', row.stress);
+      setSeg('missed_diet', row.missed_diet);
+      setSeg('steps_done', row.steps_done);
+      setSeg('energy_crash', row.energy_crash);
+      setSeg('strength_up', row.strength_up);
+      setSeg('photo_shared', row.photo_shared);
+      if (row.missed_diet === 'Yes') { const n = $('#f-diet-note'); if (n) n.style.display = 'block'; }
+      const days = { mon:'weight_mon',tue:'weight_tue',wed:'weight_wed',thu:'weight_thu',fri:'weight_fri',sat:'weight_sat',sun:'weight_sun' };
+      Object.entries(days).forEach(([d, col]) => {
+        const inp = document.querySelector(`input[data-day="${d}"]`);
+        if (inp && row[col] != null) inp.value = row[col];
+      });
+    } catch (_) {}
+  }
+  await prefillForDate(today);
+  $('#f-date').addEventListener('change', () => prefillForDate($('#f-date').value));
+
+  // ── Submit ──
+  $('#ci-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = $('#f-name').value.trim();
+    const date = $('#f-date').value;
+    const overall = $('#f-overall').value.trim();
+
+    // Required fields
+    const missing = [];
+    if (!name) missing.push('your name');
+    if (!date) missing.push('the date');
+    if (!overall) missing.push('how your week was');
+    if (!segVal('feeling')) missing.push('how you feel inside');
+    if (!segVal('stress')) missing.push('your stress level');
+    if (!segVal('missed_diet')) missing.push('the diet question');
+    if (!segVal('steps_done')) missing.push('the steps question');
+    if (!segVal('energy_crash')) missing.push('the energy question');
+    if (!segVal('strength_up')) missing.push('the strength question');
+    if ($('#f-train-days').value === '') missing.push('days trained');
+    if (!segVal('photo_shared')) missing.push('the progress photo question');
+    if (missing.length) {
+      if (window.toast) window.toast('Please fill in: ' + missing.slice(0, 3).join(', ') + (missing.length > 3 ? '…' : ''), 'error');
+      return;
+    }
+
+    const num = (v) => v === '' || v == null ? null : parseFloat(v);
+    const payload = {
+      full_name: name,
+      week_overall: overall,
+      feeling: segVal('feeling'),
+      stress: parseInt(segVal('stress'), 10),
+      missed_diet: segVal('missed_diet'),
+      missed_diet_note: segVal('missed_diet') === 'Yes' ? ($('#f-diet-note').value.trim() || null) : null,
+      steps_done: segVal('steps_done'),
+      energy_crash: segVal('energy_crash'),
+      strength_up: segVal('strength_up'),
+      train_days: parseInt($('#f-train-days').value, 10),
+      train_note: $('#f-train-note').value.trim() || null,
+      weight_mon: num(document.querySelector('input[data-day="mon"]').value),
+      weight_tue: num(document.querySelector('input[data-day="tue"]').value),
+      weight_wed: num(document.querySelector('input[data-day="wed"]').value),
+      weight_thu: num(document.querySelector('input[data-day="thu"]').value),
+      weight_fri: num(document.querySelector('input[data-day="fri"]').value),
+      weight_sat: num(document.querySelector('input[data-day="sat"]').value),
+      weight_sun: num(document.querySelector('input[data-day="sun"]').value),
+      photo_shared: segVal('photo_shared'),
+    };
+
+    const btn = $('#ci-submit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      await saveWeeklyCheckIn(cid, date, payload);
+      if (window.celebrate) window.celebrate();
+      if (window.toast) window.toast('Check-in submitted — your coach will see it 💪', 'success');
+      await renderHistory();
+    } catch (_) {
+      if (window.toast) window.toast('Could not save — please try again', 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Submit Check-In';
+    }
+  });
+
+  // ── History list ──
+  const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+  async function renderHistory() {
+    const wrap = $('#ci-history');
+    const rows = await loadWeeklyCheckIns(cid, 26);
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="ci-empty">No check-ins yet — fill out the form above to send your first one.</div>';
+      return;
+    }
+    wrap.innerHTML = rows.map((r, i) => {
+      const stressTag = r.stress != null
+        ? `<span class="ci-tag ${r.stress >= 7 ? 'bad' : (r.stress <= 3 ? 'good' : 'neutral')}">Stress ${r.stress}/10</span>` : '';
+      const strengthTag = r.strength_up
+        ? `<span class="ci-tag ${r.strength_up === 'Yes' ? 'good' : (r.strength_up === 'No' ? 'bad' : 'neutral')}">Strength ${esc(r.strength_up)}</span>` : '';
+      return `
+      <div class="ci-card${i === 0 ? ' open' : ''}">
+        <div class="ci-card-head">
+          <div class="ci-card-id">
+            <div class="ci-card-name">${fmtDate(r.date)}</div>
+            <div class="ci-card-date">${esc(r.feeling || '')}</div>
+          </div>
+          <div class="ci-card-tags">${stressTag}${strengthTag}</div>
+          <span class="ci-card-caret">${window.icon ? window.icon('trending') : '▾'}</span>
+        </div>
+        <div class="ci-card-body">${renderAnswers(r)}</div>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.ci-card-head').forEach(h => {
+      h.addEventListener('click', () => h.closest('.ci-card').classList.toggle('open'));
+    });
+  }
+
+  function renderAnswers(r) {
+    const cell = (label, val, cls = '') => val == null || val === '' ? '' :
+      `<div class="${cls}"><div class="ci-ans-label">${label}</div><div class="ci-ans-val${cls.includes('full') ? ' free' : ''}">${esc(String(val))}</div></div>`;
+    const days = [['Mon',r.weight_mon],['Tue',r.weight_tue],['Wed',r.weight_wed],['Thu',r.weight_thu],['Fri',r.weight_fri],['Sat',r.weight_sat],['Sun',r.weight_sun]];
+    const wPills = days.filter(([,v]) => v != null)
+      .map(([d,v]) => `<div class="ci-weight-pill"><span>${d}</span>${parseFloat(v)}kg</div>`).join('');
+    return `<div class="ci-ans-grid">
+      ${cell('Overall', r.week_overall, 'ci-ans-full')}
+      ${cell('Feeling', r.feeling)}
+      ${cell('Stress', r.stress != null ? r.stress + '/10' : '')}
+      ${cell('Missed diet', r.missed_diet)}
+      ${cell('Steps target', r.steps_done)}
+      ${cell('Energy crash', r.energy_crash)}
+      ${cell('Strength up', r.strength_up)}
+      ${cell('Days trained', r.train_days)}
+      ${cell('Progress photo', r.photo_shared)}
+      ${r.missed_diet_note ? cell('Diet notes', r.missed_diet_note, 'ci-ans-full') : ''}
+      ${r.train_note ? cell('Training notes', r.train_note, 'ci-ans-full') : ''}
+      ${wPills ? `<div class="ci-ans-full"><div class="ci-ans-label">Daily Weights</div><div class="ci-weights-row">${wPills}</div></div>` : ''}
+    </div>`;
+  }
+
+  await renderHistory();
+})();
+</script>
+</body>
+</html>

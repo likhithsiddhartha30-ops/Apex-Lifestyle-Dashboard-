@@ -13,7 +13,7 @@ while ($listener.IsListening) {
     $file = Join-Path $root ($localPath.TrimStart('/'))
     if (Test-Path $file -PathType Leaf) {
         $ext = [System.IO.Path]::GetExtension($file).ToLower()
-        $mime = switch ($ext) { '.html' {'text/html'} '.css' {'text/css'} '.js' {'application/javascript'} default {'application/octet-stream'} }
+        $mime = switch ($ext) { '.html' {'text/html'} '.css' {'text/css'} '.js' {'application/javascript'} '.ico' {'image/x-icon'} '.png' {'image/png'} '.jpg' {'image/jpeg'} '.jpeg' {'image/jpeg'} '.svg' {'image/svg+xml'} default {'application/octet-stream'} }
         $bytes = [System.IO.File]::ReadAllBytes($file)
         $res.ContentType = $mime
         $res.Headers.Add('Cache-Control', 'no-cache, no-store, must-revalidate')
