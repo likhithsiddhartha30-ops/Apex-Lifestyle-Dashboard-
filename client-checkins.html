@@ -55,7 +55,7 @@
     <div class="pg-title" style="margin-bottom:8px">How Was Your Week?</div>
 
     <div class="ci-intro">
-      <p>Fill this out honestly every Monday. Your coach reviews all responses. Takes 3–5 minutes.</p>
+      <p>Fill this out honestly once a week. Your coach reviews all responses. Takes 3–5 minutes.</p>
     </div>
 
     <div id="ci-status" class="ci-status" style="display:none"></div>
@@ -71,8 +71,8 @@
       </div>
 
       <div class="ci-q">
-        <div class="ci-q-label">This Week's Check-In (Monday) <span class="ci-req">*</span></div>
-        <div class="ci-q-hint">Locked to the current week — check-ins are done every Monday.</div>
+        <div class="ci-q-label">This Week's Check-In <span class="ci-req">*</span></div>
+        <div class="ci-q-hint">Anchored to the current week — one check-in per week.</div>
         <input class="form-input" id="f-date" type="date" readonly>
       </div>
 
@@ -253,8 +253,9 @@
   } catch (_) {}
 
   // ── Weekly cadence — check-ins are done on Monday, once per week ──
-  // Every entry is anchored to its week's Monday date, so "once a week" is just
-  // "one row per Monday". The form only opens on Monday and locks after submit.
+  // Each entry is anchored to its week's Monday date, so "once a week" is just
+  // "one row per Monday". The form can be filled any day of the week, but once
+  // submitted it locks until the next week begins.
   const pad = (n) => String(n).padStart(2, '0');
   const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const weekMonday = (offsetWeeks = 0) => {
@@ -264,7 +265,6 @@
     return ymd(d);
   };
   const prettyMon  = (s) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-  const isMonday   = getNowIST().getDay() === 1;
   const thisMonday = weekMonday(0);
   const nextMonday = weekMonday(1);
 
@@ -312,23 +312,15 @@
     lockForm();
     setStatus('done', 'This week\'s check-in is complete',
       `Submitted for the week of ${prettyMon(thisMonday)}. Your next check-in opens ${prettyMon(nextMonday)}.`);
-  } else if (!isMonday) {
-    lockForm();
-    setStatus('closed', 'Check-ins open every Monday',
-      `Your weekly check-in isn't open right now — come back on ${prettyMon(nextMonday)} to fill it out.`);
   }
-  // else: it's Monday and not yet submitted → the form stays open
+  // else: not yet submitted this week → the form stays open (any day)
 
   // ── Submit ──
   $('#ci-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Weekly gate: only on Monday, and never twice in the same week.
+    // Weekly gate: never twice in the same week (one row per Monday).
     if ($('#ci-form').classList.contains('locked')) return;
-    if (!isMonday) {
-      if (window.toast) window.toast('Check-ins can only be submitted on Mondays', 'error');
-      return;
-    }
 
     const name = $('#f-name').value.trim();
     const date = thisMonday;
