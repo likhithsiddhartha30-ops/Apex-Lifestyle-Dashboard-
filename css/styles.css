@@ -1543,6 +1543,8 @@ input[type="checkbox"]:active { transform: scale(1.25); }
   display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 18px;
 }
 .ci-review-bar .form-input { flex: 1; min-width: 180px; }
+.ci-review-bar #ci-filter-scope { flex: 0 0 auto; }
+.ci-export-btn { flex: 0 0 auto; white-space: nowrap; }
 .ci-empty {
   background: var(--card); border: 1px dashed var(--border2); border-radius: var(--r);
   padding: 40px 20px; text-align: center; color: var(--t2); font-size: 13px;

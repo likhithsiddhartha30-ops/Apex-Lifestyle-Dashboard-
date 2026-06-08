@@ -980,3 +980,79 @@ document.addEventListener('change', (e) => {
   const cheers = ['Nice work! 💪', 'Crushing it! 🔥', 'One down! ✅', 'Beast mode 🦁', 'Keep it up! ⚡', 'Logged! 🎯'];
   window.toast(cheers[Math.floor(Math.random() * cheers.length)], 'success', 1800);
 });
+
+/* ════════════════════════════════════════════════════════════
+   WEEKLY CHECK-IN EXPORTS — Excel (SheetJS) + PDF (jsPDF)
+   Coaches export the responses they're currently viewing.
+   `nameOf(row)` resolves the client's display name.
+   ════════════════════════════════════════════════════════════ */
+window.checkInExportMatrix = function (rows, nameOf) {
+  nameOf = nameOf || (r => r.full_name || 'Client');
+  const v = (x) => (x === null || x === undefined ? '' : x);
+  const header = [
+    'Client', 'Date', 'Feeling', 'Stress (1-10)', 'Missed Diet', 'Diet Note',
+    'Steps Target', 'Energy Crash', 'Strength Up', 'Days Trained', 'Training Note',
+    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Progress Photo', 'Week Overall',
+  ];
+  const body = rows.map(r => [
+    nameOf(r), v(r.date), v(r.feeling), v(r.stress), v(r.missed_diet), v(r.missed_diet_note),
+    v(r.steps_done), v(r.energy_crash), v(r.strength_up), v(r.train_days), v(r.train_note),
+    v(r.weight_mon), v(r.weight_tue), v(r.weight_wed), v(r.weight_thu), v(r.weight_fri),
+    v(r.weight_sat), v(r.weight_sun), v(r.photo_shared), v(r.week_overall),
+  ]);
+  return { header, body };
+};
+
+window.exportCheckInsExcel = function (rows, nameOf, filename) {
+  if (typeof XLSX === 'undefined') {
+    if (window.toast) window.toast('Excel library still loading — try again in a moment', 'error');
+    return;
+  }
+  if (!rows || !rows.length) { if (window.toast) window.toast('Nothing to export', 'error'); return; }
+  const { header, body } = window.checkInExportMatrix(rows, nameOf);
+  const ws = XLSX.utils.aoa_to_sheet([header, ...body]);
+  ws['!cols'] = header.map(h =>
+    /Overall|Note/.test(h) ? { wch: 40 } : (h === 'Client' ? { wch: 22 } : { wch: Math.max(h.length + 2, 8) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Check-Ins');
+  XLSX.writeFile(wb, filename || `check-ins-${getTodayIST()}.xlsx`);
+  if (window.toast) window.toast(`Exported ${rows.length} check-in${rows.length > 1 ? 's' : ''} to Excel 📊`, 'success');
+};
+
+window.exportCheckInsPDF = function (rows, nameOf, filename, subtitle) {
+  const ns = window.jspdf;
+  if (!ns || typeof ns.jsPDF === 'undefined') {
+    if (window.toast) window.toast('PDF library still loading — try again in a moment', 'error');
+    return;
+  }
+  if (!rows || !rows.length) { if (window.toast) window.toast('Nothing to export', 'error'); return; }
+  nameOf = nameOf || (r => r.full_name || 'Client');
+  const doc = new ns.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const num = (x) => (x === null || x === undefined || x === '' ? '' : x);
+  const weights = (r) => [r.weight_mon, r.weight_tue, r.weight_wed, r.weight_thu, r.weight_fri, r.weight_sat, r.weight_sun]
+    .map(w => (w === null || w === undefined ? '–' : w)).join('/');
+  const notes = (r) => [r.week_overall, r.missed_diet_note ? 'Diet: ' + r.missed_diet_note : '', r.train_note ? 'Training: ' + r.train_note : '']
+    .filter(Boolean).join('\n');
+
+  const head = [['Client', 'Date', 'Feeling', 'Stress', 'Missed Diet', 'Steps', 'Energy Crash', 'Strength', 'Days', 'Weights Mon–Sun', 'Photo', 'Notes']];
+  const bodyRows = rows.map(r => [
+    nameOf(r), num(r.date), num(r.feeling), num(r.stress), num(r.missed_diet), num(r.steps_done),
+    num(r.energy_crash), num(r.strength_up), num(r.train_days), weights(r), num(r.photo_shared), notes(r),
+  ]);
+
+  doc.setFontSize(16); doc.setTextColor(20);
+  doc.text('Weekly Check-In Report', 14, 14);
+  doc.setFontSize(9); doc.setTextColor(120);
+  doc.text(`${subtitle || 'All clients'} · ${rows.length} response${rows.length > 1 ? 's' : ''} · Generated ${getTodayIST()}`, 14, 20);
+
+  doc.autoTable({
+    head, body: bodyRows, startY: 25,
+    styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak', valign: 'top' },
+    headStyles: { fillColor: [255, 117, 31], textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    columnStyles: { 0: { cellWidth: 26 }, 9: { cellWidth: 30 }, 11: { cellWidth: 60 } },
+    margin: { left: 14, right: 14 },
+  });
+  doc.save(filename || `check-ins-${getTodayIST()}.pdf`);
+  if (window.toast) window.toast(`Exported ${rows.length} check-in${rows.length > 1 ? 's' : ''} to PDF 📄`, 'success');
+};

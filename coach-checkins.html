@@ -61,6 +61,8 @@
         <option value="all">All clients</option>
         <option value="selected">Selected client only</option>
       </select>
+      <button class="btn-outline ci-export-btn" id="ci-export-xlsx" type="button">Export Excel</button>
+      <button class="btn-outline ci-export-btn" id="ci-export-pdf" type="button">Export PDF</button>
     </div>
 
     <div id="ci-list"><div class="ci-empty">Loading…</div></div>
@@ -69,6 +71,9 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="js/supabase.js?v=2"></script>
 <script src="js/main.js"></script>
 <script>
@@ -121,15 +126,18 @@
     return out;
   }
 
-  function render() {
+  function currentRows() {
     const q = $('#ci-filter-name').value.trim().toLowerCase();
     const scope = $('#ci-filter-scope').value;
     const cid = getClientId();
-
     let rows = all.slice();
     if (scope === 'selected' && cid) rows = rows.filter(r => String(r.client_id) === String(cid));
     if (q) rows = rows.filter(r => clientName(r).toLowerCase().includes(q));
+    return rows;
+  }
 
+  function render() {
+    const rows = currentRows();
     const wrap = $('#ci-list');
     if (!rows.length) {
       wrap.innerHTML = '<div class="ci-empty">No check-ins found.</div>';
@@ -155,6 +163,20 @@
 
   $('#ci-filter-name').addEventListener('input', render);
   $('#ci-filter-scope').addEventListener('change', render);
+
+  function exportSubtitle() {
+    const q = $('#ci-filter-name').value.trim();
+    if (q) return `Filter: "${q}"`;
+    if ($('#ci-filter-scope').value === 'selected') {
+      const cid = getClientId();
+      const row = all.find(r => String(r.client_id) === String(cid));
+      return row ? clientName(row) : 'Selected client';
+    }
+    return 'All clients';
+  }
+  $('#ci-export-xlsx').addEventListener('click', () => window.exportCheckInsExcel(currentRows(), clientName));
+  $('#ci-export-pdf').addEventListener('click', () => window.exportCheckInsPDF(currentRows(), clientName, null, exportSubtitle()));
+
   render();
 })();
 </script>
