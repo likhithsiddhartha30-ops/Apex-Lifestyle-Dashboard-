@@ -55,6 +55,13 @@
     <div class="pg-title">Training Protocol</div>
     <div class="pg-sub">Hypertrophy Phase 2 · Week 4 of 6</div>
 
+    <!-- Week navigation -->
+    <div class="week-nav">
+      <button class="week-nav-btn" id="week-prev" title="Previous week" disabled>‹</button>
+      <div class="week-nav-label" id="week-label">This Week</div>
+      <button class="week-nav-btn" id="week-next" title="Next week" disabled>›</button>
+    </div>
+
     <!-- Day selector -->
     <div class="day-row">
       <div class="day-btn active"><span class="day-dname">Mon</span><span class="day-dnum">18</span></div>
@@ -400,17 +407,33 @@ function closeWorkoutForm() {
   const daysSinceMon = (todayUTC.getUTCDay() + 6) % 7;         // Mon=0 … Sun=6
 
   const dayBtns = document.querySelectorAll('.day-btn');
-  dayBtns.forEach((btn, i) => {
-    const d   = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon + i, 12));
-    const iso = d.toISOString().split('T')[0];   // UTC noon → date never shifts across midnight
-    btn.dataset.date = iso;
-    btn.classList.remove('active');
-    if (iso === today) btn.classList.add('active');
-    const dname = btn.querySelector('.day-dname');
-    const dnum  = btn.querySelector('.day-dnum');
-    if (dname) dname.textContent = dayNames[d.getUTCDay()];
-    if (dnum)  dnum.textContent  = d.getUTCDate();
+
+  // ── Week navigation state ───────────────────────────────────────────
+  // offset 0 = current week, -1 = last week, etc. The client can page back
+  // to the week they started training and forward up to the current week.
+  let _trainWeekOffset = 0;
+  let _minWeekOffset   = 0;
+
+  // Mon–Sun date strings ("YYYY-MM-DD") for the week `offset` weeks from now.
+  // All arithmetic in UTC-noon so dates never shift across a timezone midnight.
+  const weekDatesFor = (offset) => Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon + offset * 7 + i, 12));
+    return d.toISOString().split('T')[0];
   });
+
+  // Earliest navigable week = the week containing the client's start date
+  // (falling back to when their account row was created).
+  try {
+    const { data: cli } = await db.from('clients')
+      .select('start_date, created_at').eq('id', _trainCid).single();
+    const startStr = (cli && (cli.start_date
+      || (cli.created_at ? cli.created_at.split('T')[0] : null))) || today;
+    const [sy, sm, sd] = startStr.split('-').map(Number);
+    const startDow = (new Date(Date.UTC(sy, sm - 1, sd, 12)).getUTCDay() + 6) % 7;
+    const startMon = new Date(Date.UTC(sy, sm - 1, sd - startDow, 12));
+    const curMon   = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon, 12));
+    _minWeekOffset = Math.min(0, Math.round((startMon - curMon) / (7 * 86400000)));
+  } catch (_) {}
 
   async function showWorkout(date) {
     _trainCurrentDate = date;
@@ -605,11 +628,8 @@ function closeWorkoutForm() {
     const labels = document.querySelectorAll('#vol-labels span');
     if (!bars.length) return;
 
-    // Build Mon–Sun date strings for this week
-    const weekDates = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(Date.UTC(yr, mo - 1, dy - daysSinceMon + i, 12));
-      return d.toISOString().split('T')[0];
-    });
+    // Mon–Sun date strings for the week currently being viewed
+    const weekDates = weekDatesFor(_trainWeekOffset);
 
     // Fetch all workouts this week in one query
     let weekWorkouts = [];
@@ -692,7 +712,54 @@ function closeWorkoutForm() {
     }
   }
 
-  await Promise.all([showWorkout(today), renderPRs(), renderVolumeChart(), renderWeeklyGoal()]);
+  /* ── Render the day selector for the currently-viewed week ─────────── */
+  function weekRangeLabel(dates) {
+    const fmt = iso => new Date(iso + 'T12:00:00Z')
+      .toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${fmt(dates[0])} – ${fmt(dates[6])}`;
+  }
+  function renderWeek() {
+    const dates = weekDatesFor(_trainWeekOffset);
+    dayBtns.forEach((btn, i) => {
+      const iso = dates[i];
+      const d   = new Date(iso + 'T12:00:00Z');
+      btn.dataset.date = iso;
+      const dname = btn.querySelector('.day-dname');
+      const dnum  = btn.querySelector('.day-dnum');
+      if (dname) dname.textContent = dayNames[d.getUTCDay()];
+      if (dnum)  dnum.textContent  = d.getUTCDate();
+    });
+
+    // Default selected day: today in the current week, otherwise the week's Monday
+    const activeDate = (_trainWeekOffset === 0 && dates.includes(today)) ? today : dates[0];
+    dayBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.date === activeDate));
+
+    const labelEl = document.getElementById('week-label');
+    if (labelEl) labelEl.textContent =
+      _trainWeekOffset === 0  ? 'This Week' :
+      _trainWeekOffset === -1 ? 'Last Week' : weekRangeLabel(dates);
+
+    const prevBtn = document.getElementById('week-prev');
+    const nextBtn = document.getElementById('week-next');
+    if (prevBtn) prevBtn.disabled = _trainWeekOffset <= _minWeekOffset;
+    if (nextBtn) nextBtn.disabled = _trainWeekOffset >= 0;
+
+    return Promise.all([showWorkout(activeDate), renderVolumeChart()]);
+  }
+
+  await Promise.all([renderWeek(), renderPRs(), renderWeeklyGoal()]);
+
+  // Page between weeks (bounded: start week … current week)
+  document.getElementById('week-prev').addEventListener('click', () => {
+    if (_trainWeekOffset <= _minWeekOffset) return;
+    _trainWeekOffset--;
+    renderWeek();
+  });
+  document.getElementById('week-next').addEventListener('click', () => {
+    if (_trainWeekOffset >= 0) return;
+    _trainWeekOffset++;
+    renderWeek();
+  });
 
   // Save weekly goal (coach)
   document.getElementById('wg-save').addEventListener('click', async () => {
